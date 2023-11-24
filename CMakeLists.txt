@@ -27,8 +27,8 @@ ament_export_libraries(jp200_demo_component)
 rclcpp_components_register_nodes(jp200_demo_component "jp200_demo_component::JP200DemoComp")
 
 add_executable(jp200_demo_node src/node.cpp)
-target_link_libraries(odrive_driver_node odrive_driver_component)
-ament_target_dependencies(jp200_demo_component
+target_link_libraries(jp200_demo_node jp200_demo_component)
+ament_target_dependencies(jp200_demo_node
   rclcpp
   std_msgs
   rclcpp_components

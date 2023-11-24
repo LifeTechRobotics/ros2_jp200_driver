@@ -1,6 +1,8 @@
 #ifndef JP200_DEMO_COMPONENT_HPP_
 #define JP200_DEMO_COMPONENT_HPP_
 
+#include "jp200_demo/jp200_utils.hpp"
+
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float32.hpp>
 

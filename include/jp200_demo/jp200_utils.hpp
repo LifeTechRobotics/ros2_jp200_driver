@@ -22,7 +22,7 @@ namespace jp200_demo_component
             {
                 bool enable;
                 float value;
-                float trajectory;
+                int trajectory;
                 float transition_time;
                 bool get_state;
             };

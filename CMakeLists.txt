@@ -14,6 +14,8 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rclcpp_components REQUIRED)
 
+include_directories(./include/)
+
 add_library(jp200_demo_component SHARED
   src/component.cpp
 )

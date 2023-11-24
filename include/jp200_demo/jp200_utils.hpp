@@ -4,6 +4,16 @@
 #include <vector>
 #include <string>
 
+#define CONTROL_MODE "EX="
+#define TARGET_ANGLE "TA="
+#define TARGET_VELOCITY "TV="
+#define TARGET_CURRENT "TC="
+#define TARGET_PWM "TP="
+#define GET_ANGLE "CA"
+#define GET_VELOCITY "CV"
+#define GET_CURRENT "CC"
+#define GET_PWM "CP"
+
 namespace jp200_demo_component
 {
     class JP200Utils{

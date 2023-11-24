@@ -1,17 +1,16 @@
 #include <rclcpp/rclcpp.hpp>
 #include "rclcpp_components/register_node_macro.hpp"
 
-#include "jp200_demo/jp200_demo_component.hpp"
+#include <jp200_demo/jp200_demo_component.hpp>
 
 #include <string>
 #include <termios.h>
 #include <fcntl.h>
 
 namespace jp200_demo_component{
-    JP200DemoComp::JP200DemoComp(
-        const std::string &node_name,
-        const rclcpp::NodeOptions& options
-    ):Node("jo200_demo", node_name, options)
+
+    JP200DemoComp::JP200DemoComp(const rclcpp::NodeOptions& options)
+    :Node("jo200_demo", options)
     {
         RCLCPP_INFO(this->get_logger(), "Start and Get Parameter");
         declare_parameter("serial_port", "/dev/ttyACM0");

@@ -8,14 +8,18 @@ namespace jp200_demo_component{
         for(JP200Cmd cmd :cmds)
         {
             packet += "#" + cmd.id;
-            packet += "EX=" + cmd.control_mode;
+            packet += CONTROL_MODE + cmd.control_mode;
             setTargetAngle(cmd, &packet);
             setTargetVelocity(cmd, &packet);
             setTargetCurrent(cmd, &packet);
             setPWM(cmd, &packet);
             setGetStateEnable(cmd, &packet);
             setPositionGain(cmd, &packet);
+            setVelocityGain(cmd, &packet);
+            setCurrentGain(cmd, &packet);
         }
+
+        packet += ">";
 
         return packet;
     }
@@ -23,7 +27,7 @@ namespace jp200_demo_component{
     void JP200Utils::setTargetAngle(JP200Cmd cmd, std::string *packet)
     {
         auto target_angle = std::to_string(cmd.angle.value * 100.0);
-        *packet += "TA=" + target_angle;
+        *packet += TARGET_ANGLE + target_angle;
         if(cmd.angle.trajectory != 0)
         {
             auto target_tajectory = std::to_string(cmd.angle.trajectory);
@@ -38,7 +42,7 @@ namespace jp200_demo_component{
     void JP200Utils::setTargetVelocity(JP200Cmd cmd, std::string *packet)
     {
         auto target_velocity = std::to_string(cmd.velocity.value * 1000.0);
-        *packet += "TV=" + target_velocity;
+        *packet += TARGET_VELOCITY + target_velocity;
         if(cmd.velocity.trajectory != 0)
         {
             auto target_trajectory = std::to_string(cmd.velocity.trajectory);

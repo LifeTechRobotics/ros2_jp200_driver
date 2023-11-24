@@ -1,6 +1,25 @@
 #include "jp200_demo/jp200_utils.hpp"
 
 namespace jp200_demo_component{
+    std::string JP200Utils::createJp200Cmd(std::vector<JP200Cmd> cmds)
+    {
+        std::string packet = "<";
+
+        for(JP200Cmd cmd :cmds)
+        {
+            packet += "#" + cmd.id;
+            packet += "EX=" + cmd.control_mode;
+            setTargetAngle(cmd, &packet);
+            setTargetVelocity(cmd, &packet);
+            setTargetCurrent(cmd, &packet);
+            setPWM(cmd, &packet);
+            setGetStateEnable(cmd, &packet);
+            setPositionGain(cmd, &packet);
+        }
+
+        return packet;
+    }
+
     void JP200Utils::setTargetAngle(JP200Cmd cmd, std::string *packet)
     {
         auto target_angle = std::to_string(cmd.angle.value * 100.0);

@@ -11,14 +11,20 @@
 #include "termios.h"
 
 namespace jp200_demo_component {
-    
+
     class JP200DemoComp : public rclcpp::Node{
         public:
             JP200DemoComp(
                 const rclcpp::NodeOptions& options=rclcpp::NodeOptions()
             );
 
-            bool OpenPort();
+            bool openPort(int cflag_baud);
+            void closePort();
+            void clearPort();
+            bool setBaudRate(const int baud_rate);
+            int readPort(uint8_t *packet, int length);
+            int writePort(uint8_t *packet, int length);
+            int getCFlagBaud(int baud_rate);
 
         private:
             std::string port_name_;

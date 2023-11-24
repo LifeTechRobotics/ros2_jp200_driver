@@ -54,9 +54,9 @@ namespace jp200_demo_component
             void setTargetCurrent(JP200Cmd cmd, std::string *packet);
             void setPWM(JP200Cmd cmd, std::string *packet);
             void setGetStateEnable(JP200Cmd cmd, std::string *packet);
-            void setPositionGain(Gains gain, std::string *packet);
-            void setVelocityGain(Gains gain, std::string *packet);
-            void setCurrentGain(Gains gain, std::string *packet);
+            void setPositionGain(JP200Cmd cmd, std::string *packet);
+            void setVelocityGain(JP200Cmd cmd, std::string *packet);
+            void setCurrentGain(JP200Cmd cmd, std::string *packet);
     };
 }
 

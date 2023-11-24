@@ -1,7 +1,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include "rclcpp_components/register_node_macro.hpp"
 
-#include "jp200_demo/jp200_demo.hpp"
+#include "jp200_demo/jp200_demo_component.hpp"
 
 #include <string>
 #include <termios.h>

@@ -84,8 +84,9 @@ namespace jp200_demo_component{
         if(cmd.get_status)*packet += "ST";
     }
 
-    void JP200Utils::setPositionGain(Gains gain, std::string *packet)
+    void JP200Utils::setPositionGain(JP200Cmd cmd, std::string *packet)
     {
+        auto gain = cmd.position_gain;
         auto p_str = std::to_string(gain.p);
         *packet += "SG0=" + p_str;
         
@@ -105,8 +106,9 @@ namespace jp200_demo_component{
             *packet += ";" + f_str;
         }
     }
-    void JP200Utils::setVelocityGain(Gains gain, std::string *packet)
+    void JP200Utils::setVelocityGain(JP200Cmd cmd, std::string *packet)
     {
+        auto gain = cmd.velocity_gain;
         auto p_str = std::to_string(gain.p);
         *packet += "SG1=" + p_str;
         
@@ -126,8 +128,9 @@ namespace jp200_demo_component{
             *packet += ";" + f_str;
         }
     }
-    void JP200Utils::setCurrentGain(Gains gain, std::string *packet)
+    void JP200Utils::setCurrentGain(JP200Cmd cmd, std::string *packet)
     {
+        auto gain = cmd.current_gain;
         auto p_str = std::to_string(gain.p);
         *packet += "SG2=" + p_str;
         

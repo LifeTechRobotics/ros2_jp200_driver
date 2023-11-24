@@ -9,14 +9,14 @@ namespace jp200_demo_component{
         {
             packet += "#" + cmd.id;
             packet += CONTROL_MODE + cmd.control_mode;
-            setTargetAngle(cmd, &packet);
-            setTargetVelocity(cmd, &packet);
-            setTargetCurrent(cmd, &packet);
-            setPWM(cmd, &packet);
+            if(cmd.angle.enable)setTargetAngle(cmd, &packet);
+            if(cmd.velocity.enable)setTargetVelocity(cmd, &packet);
+            if(cmd.current.enable)setTargetCurrent(cmd, &packet);
+            if(cmd.pwm_enable)setPWM(cmd, &packet);
             setGetStateEnable(cmd, &packet);
-            setPositionGain(cmd, &packet);
-            setVelocityGain(cmd, &packet);
-            setCurrentGain(cmd, &packet);
+            if(cmd.position_gain.enable)setPositionGain(cmd, &packet);
+            if(cmd.velocity.enable)setVelocityGain(cmd, &packet);
+            if(cmd.current_gain.enable)setCurrentGain(cmd, &packet);
         }
 
         packet += ">";
@@ -57,7 +57,7 @@ namespace jp200_demo_component{
     void JP200Utils::setTargetCurrent(JP200Cmd cmd, std::string *packet)
     {
         auto target_current = std::to_string(cmd.current.value);
-        *packet += "TC=" + target_current;
+        *packet += TARGET_CURRENT + target_current;
         if(cmd.current.trajectory != 0)
         {
             auto target_trajectory = std::to_string(cmd.current.trajectory);
@@ -72,27 +72,27 @@ namespace jp200_demo_component{
     void JP200Utils::setPWM(JP200Cmd cmd, std::string *packet)
     {
             auto target_pwm = std::to_string(cmd.pwm_rate);
-            *packet += "TP=" + target_pwm;
+            *packet += TARGET_PWM + target_pwm;
     }
 
     void JP200Utils::setGetStateEnable(JP200Cmd cmd, std::string *packet)
     {
-        if(cmd.angle.get_state)*packet += "CA";
-        if(cmd.velocity.get_state)*packet += "CV";
-        if(cmd.current.get_state)*packet += "CC";
-        if(cmd.get_pwm)*packet += "CP";
-        if(cmd.get_mpu_temp)*packet += "CT0";
-        if(cmd.get_amp_temp)*packet += "CT1";
-        if(cmd.get_motor_temp)*packet += "CT2";
-        if(cmd.get_voltage)*packet += "CB";
-        if(cmd.get_status)*packet += "ST";
+        if(cmd.angle.get_state)*packet += GET_ANGLE;
+        if(cmd.velocity.get_state)*packet += GET_VELOCITY;
+        if(cmd.current.get_state)*packet += GET_CURRENT;
+        if(cmd.get_pwm)*packet += GET_PWM;
+        if(cmd.get_mpu_temp)*packet += GET_MPU_TEMP;
+        if(cmd.get_amp_temp)*packet += GET_AMP_TEMP;
+        if(cmd.get_motor_temp)*packet += GET_MOTOR_TEMP;
+        if(cmd.get_voltage)*packet += GET_VOLTAGE;
+        if(cmd.get_status)*packet += GET_STATUS;
     }
 
     void JP200Utils::setPositionGain(JP200Cmd cmd, std::string *packet)
     {
         auto gain = cmd.position_gain;
         auto p_str = std::to_string(gain.p);
-        *packet += "SG0=" + p_str;
+        *packet += POSITION_GAIN + p_str;
         
         if(gain.i != 0.0)
         {
@@ -114,7 +114,7 @@ namespace jp200_demo_component{
     {
         auto gain = cmd.velocity_gain;
         auto p_str = std::to_string(gain.p);
-        *packet += "SG1=" + p_str;
+        *packet += VELOCITY_GAIN + p_str;
         
         if(gain.i != 0.0)
         {
@@ -136,7 +136,7 @@ namespace jp200_demo_component{
     {
         auto gain = cmd.current_gain;
         auto p_str = std::to_string(gain.p);
-        *packet += "SG2=" + p_str;
+        *packet += CURRENT_GAIN + p_str;
         
         if(gain.i != 0.0)
         {

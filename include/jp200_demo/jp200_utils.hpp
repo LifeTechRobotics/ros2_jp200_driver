@@ -13,6 +13,14 @@
 #define GET_VELOCITY "CV"
 #define GET_CURRENT "CC"
 #define GET_PWM "CP"
+#define GET_MPU_TEMP "CT0"
+#define GET_AMP_TEMP "CT1"
+#define GET_MOTOR_TEMP "CT2"
+#define GET_VOLTAGE "CB"
+#define GET_STATUS "ST"
+#define POSITION_GAIN "SG0="
+#define VELOCITY_GAIN "SG1="
+#define CURRENT_GAIN "SG2="
 
 namespace jp200_demo_component
 {
@@ -67,6 +75,8 @@ namespace jp200_demo_component
             void setPositionGain(JP200Cmd cmd, std::string *packet);
             void setVelocityGain(JP200Cmd cmd, std::string *packet);
             void setCurrentGain(JP200Cmd cmd, std::string *packet);
+            bool getCmdResult(std::string rx_packet, std::string cmd_name);
+            double getState(std::string rx_packet, std::string cmd_name);
     };
 }
 

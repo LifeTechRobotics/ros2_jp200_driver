@@ -59,6 +59,16 @@ namespace jp200_demo_component{
     {
         tcflush(fd_, TCIFLUSH);
     }
+
+    int JP200DemoComp::readPort(uint8_t *buffer, int length)
+    {
+        return read(fd_, buffer, length);
+    }
+    int JP200DemoComp::writePort(uint8_t *buffer, int length)
+    {
+        return write(fd_, buffer, length);
+    }
+
     bool JP200DemoComp::setBaudRate(const int baud_rate)
     {
         int baud = getCFlagBaud(baud_rate);
@@ -76,6 +86,7 @@ namespace jp200_demo_component{
             return openPort(baud);
         }
     }
+
     int JP200DemoComp::getCFlagBaud(int baudrate)
     {
         switch(baudrate)

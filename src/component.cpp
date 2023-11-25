@@ -29,7 +29,9 @@ namespace jp200_demo_component{
         // add subscriber
         for(auto cmd:commands_)
         {
-            if(cmd.angle.enable)cmd_subscribers_.push_back(create_subscription<std_msgs::msg::Float32>("test", 1, sub_cmd_callback));
+            if(cmd.angle.enable)cmd_subscribers_.push_back(create_subscription<std_msgs::msg::Float32>(cmd.id + "/target_angle", 1, sub_cmd_callback));
+            if(cmd.velocity.enable)cmd_subscribers_.push_back(create_subscription<std_msgs::msg::Float32>(cmd.id + "/target_velocity", 1, sub_cmd_callback));
+            if(cmd.current.enable)cmd_subscribers_.push_back(create_subscription<std_msgs::msg::Float32>(cmd.id + "/target_current", 1, sub_cmd_callback));
         }
 
         RCLCPP_INFO(this->get_logger(), "Open Serial port");

@@ -16,6 +16,8 @@
 #include <sys/ioctl.h>
 #include <linux/serial.h>
 
+#define LATENCY_TIMER 16
+
 namespace jp200_demo_component {
 
     class JP200DemoComp : public rclcpp::Node{
@@ -42,6 +44,9 @@ namespace jp200_demo_component {
             int baud_rate_;
             int fd_;
             double tx_time_per_bytes;
+            double packet_start_time_;
+            double packet_timeout_;
+            std::vector<JP200Utils::JP200Cmd> commands_;
             std::vector<rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr> cmd_subscribers_;
             std::vector<rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr> state_publishers_;
     };

@@ -64,9 +64,36 @@ namespace jp200_demo_component{
     {
         return read(fd_, buffer, length);
     }
+
     int JP200DemoComp::writePort(uint8_t *buffer, int length)
     {
         return write(fd_, buffer, length);
+    }
+
+    void JP200DemoComp::setPacketTimeOut(uint16_t packet_length)
+    {
+        packet_start_time_ = getCurrentTime();
+        packet_timeout_ = (tx_time_per_bytes * (double)packet_length) + (LATENCY_TIMER * 2.0) + 2.0;
+    }
+
+    // return milli sec
+    double JP200DemoComp::getCurrentTime()
+    {
+        struct timespec tv;
+        clock_gettime(CLOCK_REALTIME, &tv);
+        return ((double)tv.tv_sec * 1000.0 + (double)tv.tv_nsec * 0.001 * 0.001);
+    }
+
+    double JP200DemoComp::getTimeSinceStart()
+    {
+        double time;
+        time = getCurrentTime() - packet_start_time_;
+        if(time < 0.0)
+        {
+            packet_start_time_ = getCurrentTime();
+        }
+
+        return time;
     }
 
     bool JP200DemoComp::setBaudRate(const int baud_rate)

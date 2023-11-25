@@ -27,6 +27,8 @@ namespace jp200_demo_component {
             );
 
             JP200Utils::JP200Cmd get_jp200_parameter(int num);
+            void sub_cmd_callback(const std_msgs::msg::Float32::SharedPtr msg, float *get_value);
+
             bool openPort(int cflag_baud);
             void closePort();
             void clearPort();
@@ -41,13 +43,13 @@ namespace jp200_demo_component {
             int getCFlagBaud(int baud_rate);
 
         private:
-            int servo_num;
             std::string port_name_;
             int baud_rate_;
             int fd_;
+            int servo_num_;
             double tx_time_per_bytes;
-            double packet_start_time_;
             double packet_timeout_;
+            double packet_start_time_;
             std::vector<JP200Utils::JP200Cmd> commands_;
             std::vector<rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr> cmd_subscribers_;
             std::vector<rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr> state_publishers_;

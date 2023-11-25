@@ -1,6 +1,10 @@
 #ifndef JP200_UTILS_HPP_
 #define JP200_UTILS_HPP_
 
+#include <rclcpp/rclcpp.hpp>
+#include <rclcpp/subscription.hpp>
+#include <std_msgs/msg/float32.hpp>
+
 #include <vector>
 #include <string>
 
@@ -77,6 +81,7 @@ namespace jp200_demo_component
             void setCurrentGain(JP200Cmd cmd, std::string *packet);
             bool getCmdResult(std::string rx_packet, std::string cmd_name);
             double getState(std::string rx_packet, std::string cmd_name);
+
     };
 }
 

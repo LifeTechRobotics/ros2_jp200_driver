@@ -26,6 +26,7 @@ namespace jp200_demo_component{
 
     void JP200Utils::setTargetAngle(JP200Cmd cmd, std::string *packet)
     {
+        std::string header = cmd.id + "/";
         auto target_angle = std::to_string(cmd.angle.value * 100.0);
         *packet += TARGET_ANGLE + target_angle;
         if(cmd.angle.trajectory != 0)

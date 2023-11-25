@@ -18,7 +18,19 @@ namespace jp200_demo_component{
         declare_parameter("servo_num", 1);
         get_parameter("serial_port", port_name_);
         get_parameter("baud_rate", baud_rate_);
-        get_parameter("servo_num", servo_num);
+        get_parameter("servo_num", servo_num_);
+
+        // get ros2 parameter from launch or yaml
+        for(int i = 0; i < servo_num_; i++)
+        {
+            commands_.push_back(get_jp200_parameter(i));
+        }
+
+        // add subscriber
+        for(auto cmd:commands_)
+        {
+            if(cmd.angle.enable)cmd_subscribers_.push_back(create_subscription<std_msgs::msg::Float32>("test", 1, sub_cmd_callback));
+        }
 
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
         if(!openPort(baud_rate_))
@@ -72,6 +84,15 @@ namespace jp200_demo_component{
         get_parameter(header +"enable/gain_current", cmd.current_gain.enable);
         
     }
+
+    void JP200DemoComp::sub_cmd_callback(
+        const std_msgs::msg::Float32::SharedPtr msg,
+        float *get_value
+    )
+    {
+        *get_value = msg->data;
+    }
+
 
     bool JP200DemoComp::openPort(int cflag_baud)
     {

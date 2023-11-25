@@ -26,11 +26,12 @@ namespace jp200_demo_component {
                 const rclcpp::NodeOptions& options=rclcpp::NodeOptions()
             );
 
+            JP200Utils::JP200Cmd get_jp200_parameter(int num);
             bool openPort(int cflag_baud);
             void closePort();
             void clearPort();
             bool setBaudRate(const int baud_rate);
-            int readPort(uint8_t *buffer, int length);
+            int readPort(std::string *rx_packet);
             int writePort(std::string tx_packet);
             void setPacketTimeOut(uint16_t packet_langth);
             void setPacketTimeOut(double msec);
@@ -40,6 +41,7 @@ namespace jp200_demo_component {
             int getCFlagBaud(int baud_rate);
 
         private:
+            int servo_num;
             std::string port_name_;
             int baud_rate_;
             int fd_;

@@ -13,6 +13,7 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(rclcpp_components REQUIRED)
+find_package(jp200_msgs REQUIRED)
 
 include_directories(./include/)
 
@@ -22,6 +23,7 @@ add_library(jp200_demo_component SHARED
 ament_target_dependencies(jp200_demo_component
   rclcpp
   std_msgs
+  jp200_msgs
   rclcpp_components
 )
 
@@ -33,6 +35,7 @@ target_link_libraries(jp200_demo_node jp200_demo_component)
 ament_target_dependencies(jp200_demo_node
   rclcpp
   std_msgs
+  jp200_msgs
   rclcpp_components
 )
 

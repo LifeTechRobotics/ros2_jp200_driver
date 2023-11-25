@@ -5,6 +5,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float32.hpp>
+#include <jp200_msgs/msg/jp200.hpp>
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -25,9 +26,6 @@ namespace jp200_demo_component {
             JP200DemoComp(
                 const rclcpp::NodeOptions& options=rclcpp::NodeOptions()
             );
-
-            JP200Utils::JP200Cmd get_jp200_parameter(int num);
-            void sub_cmd_callback(const std_msgs::msg::Float32::SharedPtr msg, float *get_value);
 
             bool openPort(int cflag_baud);
             void closePort();
@@ -50,8 +48,10 @@ namespace jp200_demo_component {
             double tx_time_per_bytes;
             double packet_timeout_;
             double packet_start_time_;
+            std::string tx_packet_;
+            std::string rx_packet_;
             std::vector<JP200Utils::JP200Cmd> commands_;
-            std::vector<rclcpp::Subscription<std_msgs::msg::Float32>::SharedPtr> cmd_subscribers_;
+            std::vector<rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr> cmd_subscribers_;
             std::vector<rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr> state_publishers_;
     };
 }

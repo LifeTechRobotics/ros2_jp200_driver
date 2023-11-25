@@ -30,7 +30,6 @@ namespace jp200_demo_component
 {
     class JP200Utils{
         public:
-            public:
             struct Gains
             {
                 bool enable;

@@ -16,6 +16,8 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <linux/serial.h>
+#include <string>
+#include <vector>
 
 #define LATENCY_TIMER 16
 
@@ -31,8 +33,8 @@ namespace jp200_demo_component {
             void closePort();
             void clearPort();
             bool setBaudRate(const int baud_rate);
-            int readPort(std::string *rx_packet);
-            int writePort(std::string tx_packet);
+            bool readPort();
+            bool writePort();
             void setPacketTimeOut(uint16_t packet_langth);
             void setPacketTimeOut(double msec);
             bool isPacketTimeOut();

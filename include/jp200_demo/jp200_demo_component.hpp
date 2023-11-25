@@ -6,9 +6,15 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float32.hpp>
 
-#include <string>
-#include <vector>
-#include "termios.h"
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
+#include <termios.h>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/ioctl.h>
+#include <linux/serial.h>
 
 namespace jp200_demo_component {
 
@@ -22,8 +28,13 @@ namespace jp200_demo_component {
             void closePort();
             void clearPort();
             bool setBaudRate(const int baud_rate);
-            int readPort(uint8_t *packet, int length);
-            int writePort(uint8_t *packet, int length);
+            int readPort(uint8_t *buffer, int length);
+            int writePort(uint8_t *buffer, int length);
+            void setPacketTimeOut(uint16_t packet_langth);
+            void setPacketTimeOut(double msec);
+            bool isPacketTimeOut();
+            double getCurrentTime();
+            double getTimeSinceStart();
             int getCFlagBaud(int baud_rate);
 
         private:

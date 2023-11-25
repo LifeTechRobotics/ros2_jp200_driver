@@ -20,18 +20,20 @@ namespace jp200_demo_component{
         get_parameter("baud_rate", baud_rate_);
         get_parameter("servo_num", servo_num_);
 
-        // get ros2 parameter from launch or yaml
-        for(int i = 0; i < servo_num_; i++)
-        {
-            commands_.push_back(get_jp200_parameter(i));
-        }
+        RCLCPP_INFO(this->get_logger(), "get Utils instance");
+        JP200Utils utils;
 
         // add subscriber
-        for(auto cmd:commands_)
+        if(servo_num_ == 1)
         {
-            if(cmd.angle.enable)cmd_subscribers_.push_back(create_subscription<std_msgs::msg::Float32>(cmd.id + "/target_angle", 1, sub_cmd_callback));
-            if(cmd.velocity.enable)cmd_subscribers_.push_back(create_subscription<std_msgs::msg::Float32>(cmd.id + "/target_velocity", 1, sub_cmd_callback));
-            if(cmd.current.enable)cmd_subscribers_.push_back(create_subscription<std_msgs::msg::Float32>(cmd.id + "/target_current", 1, sub_cmd_callback));
+            auto callback =
+            [this](const typename jp200_msgs::msg::JP200::SharedPtr msg)-> void
+            {
+                commands_[0].angle.enable = msg->angle_cmd.enable;
+            };
+
+            RCLCPP_INFO(this->get_logger(), "create subscriber");
+            cmd_subscribers_.push_back(create_subscription<jp200_msgs::msg::JP200>("0/to_jp200", 1, callback));
         }
 
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
@@ -40,61 +42,8 @@ namespace jp200_demo_component{
             RCLCPP_ERROR(this->get_logger(), "Failed to open serial port!");
         }
 
-
+        tx_packet_ = utils.createJp200Cmd(commands_);
     }
-
-    JP200Utils::JP200Cmd JP200DemoComp::get_jp200_parameter(int num)
-    {
-        JP200Utils::JP200Cmd cmd = {};
-        std::string header = num + "/";
-        declare_parameter(header +"id", 0);
-        declare_parameter(header +"control_mode", 1);
-        declare_parameter(header +"enable/target_angle", false);
-        declare_parameter(header +"enable/target_velocity", false);
-        declare_parameter(header +"enable/target_current", false);
-        declare_parameter(header +"enable/target_pwm", false);
-        declare_parameter(header +"enable/get_angle", false);
-        declare_parameter(header +"enable/get_velocity", false);
-        declare_parameter(header +"enable/get_current", false);
-        declare_parameter(header +"enable/get_pwm", false);
-        declare_parameter(header +"enable/get_mpu", false);
-        declare_parameter(header +"enable/get_amp", false);
-        declare_parameter(header +"enable/get_motor", false);
-        declare_parameter(header +"enable/get_voltage", false);
-        declare_parameter(header +"enable/get_status", false);
-        declare_parameter(header +"enable/gain_position", false);
-        declare_parameter(header +"enable/gain_velocity", false);
-        declare_parameter(header +"enable/gain_current", false);
-
-        get_parameter(header +"id", cmd.id);
-        get_parameter(header +"control_mode", cmd.control_mode);
-        get_parameter(header +"enable/target_angle", cmd.angle.enable);
-        get_parameter(header +"enable/target_velocity", cmd.velocity.enable);
-        get_parameter(header +"enable/target_current", cmd.current.enable);
-        get_parameter(header +"enable/target_pwm", cmd.pwm_enable);
-        get_parameter(header +"enable/get_angle", cmd.angle.get_state);
-        get_parameter(header +"enable/get_velocity", cmd.velocity.get_state);
-        get_parameter(header +"enable/get_current", cmd.current.get_state);
-        get_parameter(header +"enable/get_pwm", cmd.get_pwm);
-        get_parameter(header +"enable/get_mpu", cmd.get_mpu_temp);
-        get_parameter(header +"enable/get_amp", cmd.get_amp_temp);
-        get_parameter(header +"enable/get_motor", cmd.get_motor_temp);
-        get_parameter(header +"enable/get_voltage", cmd.get_voltage);
-        get_parameter(header +"enable/get_status", cmd.get_status);
-        get_parameter(header +"enable/gain_position", cmd.position_gain.enable);
-        get_parameter(header +"enable/gain_velocity", cmd.velocity_gain.enable);
-        get_parameter(header +"enable/gain_current", cmd.current_gain.enable);
-        
-    }
-
-    void JP200DemoComp::sub_cmd_callback(
-        const std_msgs::msg::Float32::SharedPtr msg,
-        float *get_value
-    )
-    {
-        *get_value = msg->data;
-    }
-
 
     bool JP200DemoComp::openPort(int cflag_baud)
     {
@@ -139,7 +88,7 @@ namespace jp200_demo_component{
     {
         uint8_t checksum = 0;
         uint8_t rx_length = 0;
-        uint8_t wait_length = 6;
+        
     }
 
     int JP200DemoComp::writePort(std::string tx_packet)
@@ -203,12 +152,15 @@ namespace jp200_demo_component{
         {
             openPort(B38400);
             baud_rate_ = baud_rate;
+            return false;
         }
         else
         {
             baud_rate_ = baud_rate;
             return openPort(baud);
         }
+
+        return true;
     }
 
     int JP200DemoComp::getCFlagBaud(int baudrate)

@@ -65,9 +65,13 @@ namespace jp200_demo_component{
         return read(fd_, buffer, length);
     }
 
-    int JP200DemoComp::writePort(uint8_t *buffer, int length)
+    int JP200DemoComp::writePort(std::string tx_packet)
     {
-        return write(fd_, buffer, length);
+        const char *send_msg = tx_packet.c_str();
+
+        int wrriten_bytes = write(fd_, send_msg, strlen(send_msg));
+
+        return wrriten_bytes;
     }
 
     void JP200DemoComp::setPacketTimeOut(uint16_t packet_length)

@@ -31,7 +31,7 @@ namespace jp200_demo_component {
             void clearPort();
             bool setBaudRate(const int baud_rate);
             int readPort(uint8_t *buffer, int length);
-            int writePort(uint8_t *buffer, int length);
+            int writePort(std::string tx_packet);
             void setPacketTimeOut(uint16_t packet_langth);
             void setPacketTimeOut(double msec);
             bool isPacketTimeOut();

@@ -76,6 +76,22 @@ namespace jp200_demo_component{
         packet_timeout_ = (tx_time_per_bytes * (double)packet_length) + (LATENCY_TIMER * 2.0) + 2.0;
     }
 
+    void JP200DemoComp::setPacketTimeOut(double msec)
+    {
+        packet_start_time_ = getCurrentTime();
+        packet_timeout_ = msec;
+    }
+
+    bool JP200DemoComp::isPacketTimeOut()
+    {
+        if(getTimeSinceStart() > packet_timeout_)
+        {
+            packet_timeout_ = 0;
+            return true;
+        }
+        return false;
+    }
+
     // return milli sec
     double JP200DemoComp::getCurrentTime()
     {

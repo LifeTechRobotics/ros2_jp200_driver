@@ -3,10 +3,6 @@
 
 #include <jp200_demo/jp200_demo_component.hpp>
 
-#include <string>
-#include <termios.h>
-#include <fcntl.h>
-
 namespace jp200_demo_component{
 
     JP200DemoComp::JP200DemoComp(const rclcpp::NodeOptions& options)
@@ -43,6 +39,9 @@ namespace jp200_demo_component{
         }
 
         tx_packet_ = utils.createJp200Cmd(commands_);
+
+        if(writePort())RCLCPP_INFO(this->get_logger(), tx_packet_.c_str());
+        if(readPort())RCLCPP_INFO(this->get_logger(), rx_packet_.c_str());
     }
 
     bool JP200DemoComp::openPort(int cflag_baud)
@@ -84,20 +83,45 @@ namespace jp200_demo_component{
         tcflush(fd_, TCIFLUSH);
     }
 
-    int JP200DemoComp::readPort(std::string *rx_packet)
+    bool JP200DemoComp::readPort()
     {
-        uint8_t checksum = 0;
+        bool result = false;
         uint8_t rx_length = 0;
+        char buffer[100];
         
+        while(true)
+        {
+            rx_length += read(fd_, buffer, sizeof(buffer));
+            if(rx_length < 0)
+            {
+                result = false;
+                break;
+            }
+            else
+            {
+                buffer[rx_length] = '\0';
+                rx_packet_ = buffer;
+                result = true;
+            }
+        }
+
+        return result;
     }
 
-    int JP200DemoComp::writePort(std::string tx_packet)
+    bool JP200DemoComp::writePort()
     {
-        const char *send_msg = tx_packet.c_str();
+        
+        const char *send_msg = tx_packet_.c_str();
 
         int wrriten_bytes = write(fd_, send_msg, strlen(send_msg));
-
-        return wrriten_bytes;
+        if(wrriten_bytes < 0)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     void JP200DemoComp::setPacketTimeOut(uint16_t packet_length)

@@ -1,0 +1,9 @@
+bool enable_get_angle
+bool enable_get_velocity
+bool enable_get_current
+bool enable_get_pwm
+bool enable_get_mpu_temp
+bool enable_get_amp_temp
+bool enable_get_motor_temp
+bool enable_get_voltage
+bool enable_get_status

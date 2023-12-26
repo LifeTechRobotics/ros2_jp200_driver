@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <iostream>
+#include <string>
 
 #include <jp200_driver/component.hpp>
 
@@ -84,6 +85,7 @@ namespace jp200_driver{
         tx_packet_ = utils.createJp200Cmd(command_);
 
         write_serial();
+
     }
 
     int JP200Component::open_port()

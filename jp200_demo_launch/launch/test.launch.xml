@@ -1,0 +1,16 @@
+<launch>
+    <node pkg="joy" exec="joy_node" name="joy_node" output="screen">
+        <remap from="/joy" to="/joy"/>
+    </node>
+
+    <node pkg="demo_command_publisher" exec="demo_command_publisher" name="demo_command_publisher" output="screen">
+        <remap from="/joy" to="/joy"/>
+        <remap from="/cmd" to="/cmd"/>
+    </node>
+
+    <node pkg="jp200_driver" exec="jp200_driver_node" name="jp200_driver_node" output="screen">
+        <remap from="/jp200_cmd" to="/cmd"/>
+        <param name="serial_port" value="/dev/ttyUSB0"/>
+        <param name="baud_rate" value="115200"/>
+    </node>
+</launch>

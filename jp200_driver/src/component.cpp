@@ -4,11 +4,11 @@
 #include <chrono>
 #include <iostream>
 
-#include <jp200_demo_ros2/component.hpp>
+#include <jp200_driver/component.hpp>
 
 using std::placeholders::_1;
 
-namespace jp200_demo_component{
+namespace jp200_driver{
 
     JP200Component::JP200Component(const rclcpp::NodeOptions& options)
     :Node("jp200_demo", options)

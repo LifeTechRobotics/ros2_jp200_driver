@@ -1,8 +1,8 @@
-#include "jp200_demo_ros2/utils.hpp"
+#include "jp200_driver/utils.hpp"
 #include <vector>
 #include <cstdint>
 
-namespace jp200_demo_component
+namespace jp200_driver
 {
     std::vector<uint8_t> JP200Utils::createJp200Cmd(JP200Cmd cmd)
     {

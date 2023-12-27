@@ -33,7 +33,7 @@ namespace jp200_driver{
         {
             RCLCPP_ERROR(this->get_logger() , "Failed to open port");
         }else{
-            RCLCPP_INFO(this->get_logger(), "Serial port was connected");
+            RCLCPP_INFO(this->get_logger(), "Serial port was connected <%d>", fd_);
         }
     }
 
@@ -86,7 +86,7 @@ namespace jp200_driver{
 
         write_serial();
 
-        RCLCPP_INFO(this->get_logger(), "%s", tx_packet_.c_str());
+        RCLCPP_INFO(this->get_logger(), "write %s to {%d}", tx_packet_.c_str(), fd_);
     }
 
     int JP200Component::open_port()

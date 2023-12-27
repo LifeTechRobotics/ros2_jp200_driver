@@ -48,6 +48,8 @@ namespace jp200_driver
                 Gains position_gain;
                 Gains velocity_gain;
                 Gains current_gain; 
+
+                bool error_checker;
             };
             
             std::string createJp200Cmd(JP200Cmd cmd);

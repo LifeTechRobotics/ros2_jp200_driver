@@ -6,13 +6,8 @@ namespace jp200_driver
 {
     std::string JP200Utils::createJp200Cmd(JP200Cmd cmd)
     {
-        auto id = serialize(cmd.id);
         std::string send = "#";
-        for(size_t i = 0; i < id.size(); i++)
-            {
-                send.push_back(id[0]);
-                id.erase(id.begin());
-            }
+        send.push_back(cmd.id);
 
         send.push_back('E');
         send.push_back('X');
@@ -247,6 +242,9 @@ namespace jp200_driver
         }
 
         send.insert(send.begin(), '<');
+
+        send.push_back(':');
+        send.push_back('170');
         send.push_back('>');
 
         return send;

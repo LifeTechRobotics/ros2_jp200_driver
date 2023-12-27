@@ -29,12 +29,8 @@ namespace jp200_driver
             send.push_back('V');
             send.push_back('=');
 
-            std::vector<uint8_t> data = serialize(cmd.velocity.value);
-            for(size_t i = 0; i < data.size(); i++)
-            {
-                send.push_back(data[0]);
-                data.erase(data.begin());
-            }
+            auto target = (int)(cmd.velocity.value);
+            send += std::to_string(target);
         }
         if(cmd.current.enable)
         {
@@ -42,12 +38,8 @@ namespace jp200_driver
             send.push_back('C');
             send.push_back('=');
 
-            std::vector<uint8_t> data = serialize(cmd.current.value);
-            for(size_t i = 0; i < data.size(); i++)
-            {
-                send.push_back(data[0]);
-                data.erase(data.begin());
-            }
+            auto target = (int)(cmd.current.value);
+            send += std::to_string(target);
         }
         if(cmd.pwm_enable)
         {
@@ -55,12 +47,8 @@ namespace jp200_driver
             send.push_back('P');
             send.push_back('=');
 
-            std::vector<uint8_t> data = serialize(cmd.pwm_rate);
-            for(size_t i = 0; i < data.size(); i++)
-            {
-                send.push_back(data[0]);
-                data.erase(data.begin());
-            }
+            auto target = (int)(cmd.pwm_rate);
+            send += std::to_string(target);
         }
         if(cmd.angle.get_state)
         {
@@ -115,41 +103,26 @@ namespace jp200_driver
             send.push_back('S');
             send.push_back('G');
             send.push_back('0');
+            send.push_back('=');
             
-            auto p_data = serialize(cmd.position_gain.p);
-            for(size_t i = 0; i < p_data.size(); i++)
-            {
-                send.push_back(p_data[0]);
-                p_data.erase(p_data.begin());
-            }
+            auto target = (int)(cmd.position_gain.p);
+            send += std::to_string(target);
             if(cmd.position_gain.i != 0.0)
             {
-                auto data = serialize(cmd.position_gain.i);
-                for(size_t i = 0; i < data.size(); i++)
-                {
-                    send.push_back(data[0]);
-                    data.erase(data.begin());
-                }
+                target = (int)(cmd.position_gain.i);
+                send += std::to_string(target);
                 send.push_back(';');
             }
             if(cmd.position_gain.d != 0.0)
             {
-                auto data = serialize(cmd.position_gain.d);
-                for(size_t i = 0; i < data.size(); i++)
-                {
-                    send.push_back(data[0]);
-                    data.erase(data.begin());
-                }
+                target = (int)(cmd.position_gain.d);
+                send += std::to_string(target);
                 send.push_back(';');
             }
             if(cmd.position_gain.f != 0.0)
             {
-                auto data = serialize(cmd.position_gain.f);
-                for(size_t i = 0; i < data.size(); i++)
-                {
-                    send.push_back(data[0]);
-                    data.erase(data.begin());
-                }
+                target = (int)(cmd.position_gain.f);
+                send += std::to_string(target);
             }
         }
         if(cmd.velocity_gain.enable)
@@ -157,41 +130,26 @@ namespace jp200_driver
             send.push_back('S');
             send.push_back('G');
             send.push_back('1');
+            send.push_back('=');
             
-            auto p_data = serialize(cmd.velocity_gain.p);
-            for(size_t i = 0; i < p_data.size(); i++)
-            {
-                send.push_back(p_data[0]);
-                p_data.erase(p_data.begin());
-            }
+            auto target = (int)(cmd.velocity_gain.p);
+            send += std::to_string(target);
             if(cmd.velocity_gain.i != 0.0)
             {
-                auto data = serialize(cmd.velocity_gain.i);
-                for(size_t i = 0; i < data.size(); i++)
-                {
-                    send.push_back(data[0]);
-                    data.erase(data.begin());
-                }
+                target = (int)(cmd.velocity_gain.i);
+                send += std::to_string(target);
                 send.push_back(';');
             }
             if(cmd.velocity_gain.d != 0.0)
             {
-                auto data = serialize(cmd.velocity_gain.d);
-                for(size_t i = 0; i < data.size(); i++)
-                {
-                    send.push_back(data[0]);
-                    data.erase(data.begin());
-                }
+                target = (int)(cmd.velocity_gain.d);
+                send += std::to_string(target);
                 send.push_back(';');
             }
             if(cmd.velocity_gain.f != 0.0)
             {
-                auto data = serialize(cmd.velocity_gain.f);
-                for(size_t i = 0; i < data.size(); i++)
-                {
-                    send.push_back(data[0]);
-                    data.erase(data.begin());
-                }
+                target = (int)(cmd.velocity_gain.f);
+                send += std::to_string(target);
             }
         }
         if(cmd.current_gain.enable)
@@ -199,41 +157,26 @@ namespace jp200_driver
             send.push_back('S');
             send.push_back('G');
             send.push_back('2');
+            send.push_back('=');
             
-            auto p_data = serialize(cmd.current_gain.p);
-            for(size_t i = 0; i < p_data.size(); i++)
-            {
-                send.push_back(p_data[0]);
-                p_data.erase(p_data.begin());
-            }
+            auto target = (int)(cmd.current_gain.p);
+            send += std::to_string(target);
             if(cmd.current_gain.i != 0.0)
             {
-                auto data = serialize(cmd.current_gain.i);
-                for(size_t i = 0; i < data.size(); i++)
-                {
-                    send.push_back(data[0]);
-                    data.erase(data.begin());
-                }
+                target = (int)(cmd.current_gain.i);
+                send += std::to_string(target);
                 send.push_back(';');
             }
             if(cmd.current_gain.d != 0.0)
             {
-                auto data = serialize(cmd.current_gain.d);
-                for(size_t i = 0; i < data.size(); i++)
-                {
-                    send.push_back(data[0]);
-                    data.erase(data.begin());
-                }
+                target = (int)(cmd.current_gain.d);
+                send += std::to_string(target);
                 send.push_back(';');
             }
             if(cmd.current_gain.f != 0.0)
             {
-                auto data = serialize(cmd.current_gain.f);
-                for(size_t i = 0; i < data.size(); i++)
-                {
-                    send.push_back(data[0]);
-                    data.erase(data.begin());
-                }
+                target = (int)(cmd.current_gain.f);
+                send += std::to_string(target);
             }
         }
 

@@ -27,12 +27,33 @@ class DemoCommandPublisher : public rclcpp::Node
     {
       auto message = jp200_msgs::msg::JP200();
       message.id = 1;
-      message.id = 1;
+      message.control_mode = 1;
 
       message.angle_cmd.enable = true;
-      message.angle_cmd.value = std::atan(get_msg->axes[0] / get_msg->axes[1]);
+      if(get_msg->buttons[0] == 1)
+      {
+        message.angle_cmd.value = 270;
 
-      publisher_->publish(message);
+        publisher_->publish(message);
+      }
+      else if(get_msg->buttons[1] == 1)
+      {
+        message.angle_cmd.value = 0;
+
+        publisher_->publish(message);
+      }
+      else if(get_msg->buttons[2] == 1)
+      {
+        message.angle_cmd.value = 90;
+
+        publisher_->publish(message);
+      }
+      else if(get_msg->buttons[3] == 1)
+      {
+        message.angle_cmd.value = 180;
+
+        publisher_->publish(message);
+      }
     }
 
     rclcpp::Publisher<jp200_msgs::msg::JP200>::SharedPtr publisher_;

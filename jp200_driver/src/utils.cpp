@@ -7,12 +7,12 @@ namespace jp200_driver
     std::string JP200Utils::createJp200Cmd(JP200Cmd cmd)
     {
         std::string send = "#";
-        send.push_back(cmd.id);
+        send += std::to_string(cmd.id);
 
         send.push_back('E');
         send.push_back('X');
         send.push_back('=');
-        send.push_back(cmd.control_mode);
+        send += std::to_string(cmd.control_mode);
 
         if(cmd.angle.enable)
         {
@@ -20,12 +20,8 @@ namespace jp200_driver
             send.push_back('A');
             send.push_back('=');
 
-            std::vector<uint8_t> data = serialize(cmd.angle.value);
-            for(size_t i = 0; i < data.size(); i++)
-            {
-                send.push_back(data[0]);
-                data.erase(data.begin());
-            }
+            auto target = (int)(cmd.angle.value);
+            send += std::to_string(target);
         }
         if(cmd.velocity.enable)
         {
@@ -242,9 +238,6 @@ namespace jp200_driver
         }
 
         send.insert(send.begin(), '<');
-
-        send.push_back(':');
-        send.push_back('170');
         send.push_back('>');
 
         return send;

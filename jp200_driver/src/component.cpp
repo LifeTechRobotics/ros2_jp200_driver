@@ -107,7 +107,7 @@ namespace jp200_driver{
 
     void JP200Component::write_serial()
     {
-        int error = write(fd_, tx_packet_.data(), tx_packet_.size());
+        int error = write(fd_, tx_packet_.c_str(), tx_packet_.size());
 
         if(error < 0){
             RCLCPP_ERROR(this->get_logger(), "Failed to write");

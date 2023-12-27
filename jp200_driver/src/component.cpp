@@ -86,6 +86,7 @@ namespace jp200_driver{
 
         write_serial();
 
+        
     }
 
     int JP200Component::open_port()

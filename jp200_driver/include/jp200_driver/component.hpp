@@ -44,7 +44,7 @@ namespace jp200_driver {
             double tx_time_per_bytes;
             double packet_timeout_;
             double packet_start_time_;
-            std::vector<uint8_t> tx_packet_;
+            std::string tx_packet_;
             std::vector<uint8_t> rx_packet_;
             JP200Utils::JP200Cmd command_;
             JP200Utils utils;

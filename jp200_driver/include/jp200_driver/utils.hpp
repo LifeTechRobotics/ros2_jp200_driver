@@ -2,6 +2,7 @@
 #define UTILS_HPP_
 
 #include <vector>
+#include <string>
 #include <cstdint>
 #include <cstring>
 #include <memory>
@@ -49,7 +50,7 @@ namespace jp200_driver
                 Gains current_gain; 
             };
             
-            std::vector<uint8_t> createJp200Cmd(JP200Cmd cmd);
+            std::string createJp200Cmd(JP200Cmd cmd);
 
             template <typename T>
             std::vector<uint8_t> serialize(const T& data) {

@@ -4,10 +4,10 @@
 
 namespace jp200_driver
 {
-    std::vector<uint8_t> JP200Utils::createJp200Cmd(JP200Cmd cmd)
+    std::string JP200Utils::createJp200Cmd(JP200Cmd cmd)
     {
         auto id = serialize(cmd.id);
-        std::vector<uint8_t> send = {'#'};
+        std::string send = "#";
         for(size_t i = 0; i < id.size(); i++)
             {
                 send.push_back(id[0]);

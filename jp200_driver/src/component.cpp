@@ -86,7 +86,7 @@ namespace jp200_driver{
 
         write_serial();
 
-        
+        RCLCPP_INFO(this->get_logger(), "%s", tx_packet_.c_str());
     }
 
     int JP200Component::open_port()

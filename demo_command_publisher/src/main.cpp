@@ -30,6 +30,8 @@ class DemoCommandPublisher : public rclcpp::Node
       message.control_mode = 1;
 
       message.angle_cmd.enable = true;
+      message.enable_pwm = true;
+      message.pwm_cmd = 10;
       if(get_msg->buttons[0] == 1)
       {
         message.angle_cmd.value = 270;

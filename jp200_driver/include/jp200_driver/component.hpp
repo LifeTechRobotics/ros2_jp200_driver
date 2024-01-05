@@ -19,8 +19,6 @@
 #include <string>
 #include <vector>
 
-#define LATENCY_TIMER 16
-
 namespace jp200_driver {
 
     class JP200Component : public rclcpp::Node{
@@ -45,11 +43,13 @@ namespace jp200_driver {
             double packet_timeout_;
             double packet_start_time_;
             std::string tx_packet_;
-            std::vector<uint8_t> rx_packet_;
+            std::string rx_packet_;
             JP200Utils::JP200Cmd command_;
             JP200Utils utils;
+
             rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_;
             rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr state_publisher_;
+            rclcpp::TimerBase::SharedPtr timer_;
     };
 }
 

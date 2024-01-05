@@ -5,9 +5,10 @@
 #include <iostream>
 #include <string>
 
-#include <jp200_driver/component.hpp>
+#include "jp200_driver/component.hpp"
 
 using std::placeholders::_1;
+using namespace std::chrono_literals;
 
 namespace jp200_driver{
 
@@ -19,8 +20,6 @@ namespace jp200_driver{
         declare_parameter("baud_rate", 115200);
         get_parameter("serial_port", port_name_);
         get_parameter("baud_rate", baud_rate_);
-
-        RCLCPP_INFO(this->get_logger(), "get Utils instance");
 
         // add subscriber
         RCLCPP_INFO(this->get_logger(), "create subscriber");
@@ -85,8 +84,10 @@ namespace jp200_driver{
         tx_packet_ = utils.createJp200Cmd(command_);
 
         write_serial();
-
         RCLCPP_INFO(this->get_logger(), "write %s to {%d}", tx_packet_.c_str(), fd_);
+
+        read_serial();
+        RCLCPP_INFO(this->get_logger(), "read %s from {%d}", rx_packet_.c_str(), fd_);
     }
 
     int JP200Component::open_port()
@@ -107,11 +108,26 @@ namespace jp200_driver{
 
     void JP200Component::write_serial()
     {
-        int error = write(fd_, tx_packet_.c_str(), tx_packet_.size());
+        const char *packet = tx_packet_.c_str();
+        int error = write(fd_, packet, strlen(packet));
 
         if(error < 0){
             RCLCPP_ERROR(this->get_logger(), "Failed to write");
         }
     }
 
+    void JP200Component::read_serial()
+    {
+        char buf[100];
+        ssize_t bytes_read = read(fd_, buf, sizeof(buf) - 1);
+        if(bytes_read < 0)
+        {
+            RCLCPP_ERROR(this->get_logger(), "Failed to read");
+        }
+        else
+        {
+            buf[bytes_read] = '\0';
+            rx_packet_ = buf;
+        }
+    }
 }

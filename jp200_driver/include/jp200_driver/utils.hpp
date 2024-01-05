@@ -53,22 +53,6 @@ namespace jp200_driver
             };
             
             std::string createJp200Cmd(JP200Cmd cmd);
-
-            template <typename T>
-            std::vector<uint8_t> serialize(const T& data) {
-                std::vector<uint8_t> bytes(sizeof(data));
-                std::memcpy(bytes.data(), &data, sizeof(data));
-                return bytes;
-            }
-
-            template <typename T>
-            T deserialize(std::vector<uint8_t>& bytes) {
-                static_assert(std::is_trivially_copyable<T>::value, "Data type is not trivially copyable");
-
-                T data;
-                std::memcpy(&data, bytes.data(), sizeof(data));
-                return data;
-            }
     };
 }
 

@@ -22,8 +22,9 @@ namespace jp200_driver{
         get_parameter("baud_rate", baud_rate_);
 
         // add subscriber
-        RCLCPP_INFO(this->get_logger(), "create subscriber");
+        RCLCPP_INFO(this->get_logger(), "Initialize node");
         cmd_subscriber_ = this->create_subscription<jp200_msgs::msg::JP200>("/jp200_cmd", 0, std::bind(&JP200Component::callback, this, _1));
+        timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::read_serial, this));
 
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
 
@@ -85,9 +86,6 @@ namespace jp200_driver{
 
         write_serial();
         RCLCPP_INFO(this->get_logger(), "write %s to {%d}", tx_packet_.c_str(), fd_);
-
-        read_serial();
-        RCLCPP_INFO(this->get_logger(), "read %s from {%d}", rx_packet_.c_str(), fd_);
     }
 
     int JP200Component::open_port()
@@ -128,6 +126,7 @@ namespace jp200_driver{
         {
             buf[bytes_read] = '\0';
             rx_packet_ = buf;
+            RCLCPP_INFO(this->get_logger(), "read %s from {%d}", rx_packet_.c_str(), fd_);
         }
     }
 }

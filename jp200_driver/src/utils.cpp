@@ -20,7 +20,7 @@ namespace jp200_driver
             send.push_back('A');
             send.push_back('=');
 
-            auto target = (int)(cmd.angle.value);
+            auto target = (int)(cmd.angle.value*100);
             send += std::to_string(target);
         }
         if(cmd.velocity.enable)
@@ -47,7 +47,7 @@ namespace jp200_driver
             send.push_back('P');
             send.push_back('=');
 
-            auto target = (int)(cmd.pwm_rate);
+            auto target = (int)(cmd.pwm_rate*100);
             send += std::to_string(target);
         }
         if(cmd.angle.get_state)

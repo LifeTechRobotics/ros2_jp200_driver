@@ -7,10 +7,7 @@
 #include "sensor_msgs/msg/joy.hpp"
 #include "jp200_msgs/msg/jp200.hpp"
 
-using std::placeholders::_1;
-
-/* This example creates a subclass of Node and uses std::bind() to register a
-* member function as a callback from the timer. */
+using namespace std::chrono_literals;
 
 class DemoCommandPublisher : public rclcpp::Node
 {
@@ -19,47 +16,33 @@ class DemoCommandPublisher : public rclcpp::Node
     : Node("demo_command_publisher")
     {
       publisher_ = this->create_publisher<jp200_msgs::msg::JP200>("/cmd", 10);
-      subscriber_ = this->create_subscription<sensor_msgs::msg::Joy>("/joy", 0, std::bind(&DemoCommandPublisher::callback, this, _1));
+      timer_ = this->create_wall_timer(1000ms, std::bind(&DemoCommandPublisher::callback, this));
     }
 
   private:
-    void callback(const sensor_msgs::msg::Joy::SharedPtr get_msg)
+    void callback()
     {
       auto message = jp200_msgs::msg::JP200();
       message.id = 1;
       message.control_mode = 1;
 
-      message.angle_cmd.enable = true;
+      // set pwm
       message.enable_pwm = true;
       message.pwm_cmd = 10;
-      if(get_msg->buttons[0] == 1)
-      {
-        message.angle_cmd.value = 270;
+      
+      // set angle command
+      message.angle_cmd.enable = true;
+      message.angle_cmd.value = count;
 
-        publisher_->publish(message);
-      }
-      else if(get_msg->buttons[1] == 1)
-      {
-        message.angle_cmd.value = 0;
+      message.state.enable_get_angle = true;
 
-        publisher_->publish(message);
-      }
-      else if(get_msg->buttons[2] == 1)
-      {
-        message.angle_cmd.value = 90;
-
-        publisher_->publish(message);
-      }
-      else if(get_msg->buttons[3] == 1)
-      {
-        message.angle_cmd.value = 180;
-
-        publisher_->publish(message);
-      }
+      publisher_->publish(message);
+      count += 10;
     }
 
     rclcpp::Publisher<jp200_msgs::msg::JP200>::SharedPtr publisher_;
-    rclcpp::Subscription<sensor_msgs::msg::Joy>::SharedPtr subscriber_;
+    rclcpp::TimerBase::SharedPtr timer_;
+    size_t count;
 };
 
 int main(int argc, char * argv[])

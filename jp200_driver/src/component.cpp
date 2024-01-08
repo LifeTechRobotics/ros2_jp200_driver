@@ -85,8 +85,11 @@ namespace jp200_driver{
 
         tx_packet_ = utils.createJp200Cmd(command_);
 
-        write_serial();
-        RCLCPP_INFO(this->get_logger(), "write %s to {%d}", tx_packet_.c_str(), fd_);
+        int error = write_serial();
+        if(error > 0)
+        {
+            RCLCPP_INFO(this->get_logger(), "write %s to {%d}", tx_packet_.c_str(), fd_);
+        }
     }
 
     int JP200Component::open_port()
@@ -115,29 +118,31 @@ namespace jp200_driver{
     {
         if(fd_ < 0)
         {
-            
+            return -1;
         }
         const char *packet = tx_packet_.c_str();
-        int error = write(fd_, packet, strlen(packet));
-
-        if(error < 0){
-            RCLCPP_ERROR(this->get_logger(), "Failed to write");
-        }
+        return write(fd_, packet, strlen(packet));
     }
 
     int JP200Component::read_serial()
     {
+        if(fd_ < 0)
+        {
+            return -1;
+        }
         char buf[100];
         ssize_t bytes_read = read(fd_, buf, sizeof(buf) - 1);
         if(bytes_read < 0)
         {
-            RCLCPP_ERROR(this->get_logger(), "Failed to read");
+            RCLCPP_ERROR(this->get_logger(), "Failed to read port");
+            return bytes_read;
         }
         else
         {
             buf[bytes_read] = '\0';
             rx_packet_ = buf;
             RCLCPP_INFO(this->get_logger(), "read %s from {%d}", rx_packet_.c_str(), fd_);
+            return bytes_read;
         }
     }
 }

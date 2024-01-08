@@ -1,7 +1,8 @@
 #ifndef UTILS_HPP_
 #define UTILS_HPP_
 
-#define EMPTY "emp"
+#define READ_EMPTY "emp"
+#define READ_ERROR "err"
 
 #include <vector>
 #include <string>

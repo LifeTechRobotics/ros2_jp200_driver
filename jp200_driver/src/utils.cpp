@@ -239,27 +239,25 @@ namespace jp200_driver
     {
         if(fd < 0)
         {
-            return "";
+            return READ_EMPTY;
         }
         char buf[100];
         ssize_t bytes_read = read(fd, buf, sizeof(buf) - 1);
         if(bytes_read < 0)
         {
-            RCLCPP_ERROR(this->get_logger(), "Failed to read port");
-            return bytes_read;
+            return READ_ERROR;
         }
         else
         {
             buf[bytes_read] = '\0';
-            rx_packet_ = buf;
-            RCLCPP_INFO(this->get_logger(), "read %s from {%d}", rx_packet_.c_str(), fd_);
-            return bytes_read;
+            std::string rx_packet_ = buf;
+            return rx_packet_;
         }
     }
 
-    speed_t JP200Utils::get_baud_rate()
+    speed_t JP200Utils::get_baud_rate(int baud_rate)
     {
-        switch(baud_rate_)
+        switch(baud_rate)
         {
             case 9600:
             return B9600;

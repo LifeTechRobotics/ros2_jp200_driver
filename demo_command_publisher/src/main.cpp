@@ -26,9 +26,9 @@ class DemoCommandPublisher : public rclcpp::Node
       message.id = 1;
       message.control_mode = 1;
 
-      // set pwm
+      // set pwm(%)
       message.enable_pwm = true;
-      message.pwm_cmd = 10;
+      message.pwm_cmd = 20;
       
       // set angle command
       message.angle_cmd.enable = true;

@@ -28,7 +28,9 @@ namespace jp200_driver{
 
         // add subscriber
         RCLCPP_INFO(this->get_logger(), "Initialize node");
-        // cmd_subscriber_ = this->create_subscription<jp200_msgs::msg::JP200>("/jp200_cmd", 0, std::bind(&JP200Component::callback, this, _1));
+        add_subscriber();
+        write_timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::write_serial));
+
         if(enable_servo_response)
         {
             read_timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::read_serial, this));
@@ -111,102 +113,5 @@ namespace jp200_driver{
         
     }
 
-    int JP200Component::open_port()
-    {
-        int fd=open(port_name_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-        fcntl(fd, F_SETFL,0);
-        struct termios conf_tio;
-        tcgetattr(fd,&conf_tio);
-        speed_t BAUDRATE = get_baud_rate();
-        cfsetispeed(&conf_tio, BAUDRATE);
-        cfsetospeed(&conf_tio, BAUDRATE);
-        conf_tio.c_lflag &= ~(ECHO | ICANON);
-        conf_tio.c_cc[VMIN]=0;
-        conf_tio.c_cc[VTIME]=0;
-        tcsetattr(fd,TCSANOW,&conf_tio);
-        return fd;
-    }
-
-    void JP200Component::close_port()
-    {
-        RCLCPP_INFO(this->get_logger(), "Close port");
-        close(fd_);
-    }
-
-    int JP200Component::write_serial()
-    {
-        if(fd_ < 0)
-        {
-            return -1;
-        }
-        const char *packet = tx_packet_.c_str();
-        return write(fd_, packet, strlen(packet));
-    }
-
-    int JP200Component::read_serial()
-    {
-        if(fd_ < 0)
-        {
-            return -1;
-        }
-        char buf[100];
-        ssize_t bytes_read = read(fd_, buf, sizeof(buf) - 1);
-        if(bytes_read < 0)
-        {
-            RCLCPP_ERROR(this->get_logger(), "Failed to read port");
-            return bytes_read;
-        }
-        else
-        {
-            buf[bytes_read] = '\0';
-            rx_packet_ = buf;
-            RCLCPP_INFO(this->get_logger(), "read %s from {%d}", rx_packet_.c_str(), fd_);
-            return bytes_read;
-        }
-    }
-
-    speed_t JP200Component::get_baud_rate()
-    {
-        switch(baud_rate_)
-        {
-            case 9600:
-            return B9600;
-            case 19200:
-            return B19200;
-            case 38400:
-            return B38400;
-            case 57600:
-            return B57600;
-            case 115200:
-            return B115200;
-            case 230400:
-            return B230400;
-            case 460800:
-            return B460800;
-            case 500000:
-            return B500000;
-            case 576000:
-            return B576000;
-            case 921600:
-            return B921600;
-            case 1000000:
-            return B1000000;
-            case 1152000:
-              return B1152000;
-            case 1500000:
-            return B1500000;
-            case 2000000:
-            return B2000000;
-            case 2500000:
-            return B2500000;
-            case 3000000:
-            return B3000000;
-            case 3500000:
-            return B3500000;
-            case 4000000:
-            return B4000000;
-            default:
-            return -1;
-        }
-    }
+    
 }

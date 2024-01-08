@@ -3,9 +3,18 @@
 
 #include <vector>
 #include <string>
-#include <cstdint>
-#include <cstring>
-#include <memory>
+#include <fcntl.h>
+#include <stdio.h>
+#include <string.h>
+#include <unistd.h>
+#include <termios.h>
+#include <time.h>
+#include <sys/time.h>
+#include <sys/ioctl.h>
+#include <linux/serial.h>
+#include <string>
+#include <vector>
+
 
 namespace jp200_driver
 {
@@ -51,8 +60,16 @@ namespace jp200_driver
 
                 bool error_checker;
             };
+
+            JP200Utils();
             
-            std::string createJp200Cmd(JP200Cmd cmd, bool enable_response);
+            std::string createJp200Cmd(std::vector<JP200Cmd> cmd, bool enable_response);
+            int open_port(std::string port_name);
+            void close_port(int fd);
+            int read_serial(int fd);
+            int write_serial(int fd, std::string tx_packet);
+            speed_t get_baud_rate(int baud_rate);
+
     };
 }
 

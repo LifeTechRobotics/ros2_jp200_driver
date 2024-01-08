@@ -18,7 +18,6 @@
 #include <string>
 #include <vector>
 
-
 namespace jp200_driver
 {
     class JP200Utils{
@@ -64,9 +63,30 @@ namespace jp200_driver
                 bool error_checker;
             };
 
-            JP200Utils();
+            struct Response
+            {
+                int id;
+                bool control_mode;
+                bool target_angle;
+                bool target_velocity;
+                bool target_current;
+                bool target_pwm;
+                bool target_position_gain;
+                bool target_velocity_gain;
+                bool target_current_gain;
+                float angle_feedback;
+                float velocity_feedback;
+                float current_feedback;
+                float pwm_feedback;
+                float mpu_temp_feedback;
+                float amp_temp_feedback;
+                float motor_temp_feedback;
+                float voltage_feedback;
+                float status_feedback;
+            };
             
             std::string createJp200Cmd(std::vector<JP200Cmd> cmd, bool enable_response);
+            Response getResponse(std::string rx_packet, int motor_id);
             int open_port(std::string port_name, int baud_rate);
             void close_port(int fd);
             std::string read_serial(int fd);

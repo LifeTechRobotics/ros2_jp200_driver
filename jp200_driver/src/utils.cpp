@@ -4,11 +4,6 @@
 
 namespace jp200_driver
 {
-    JP200Utils::JP200Utils()
-    {
-
-    }
-
     std::string JP200Utils::createJp200Cmd(std::vector<JP200Cmd> cmds, bool enable_response)
     {
         std::string send;

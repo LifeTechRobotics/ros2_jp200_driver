@@ -19,13 +19,8 @@ namespace jp200_driver {
 
             void add_subscriber();
             void add_publisher();
-            void callback(const jp200_msgs::msg::JP200 msg);
-
-            int open_port();
-            void close_port();
-            int read_serial();
-            int write_serial();
-            speed_t get_baud_rate();
+            void callback_write();
+            void callback_read();
 
         private:
             std::string port_name_;

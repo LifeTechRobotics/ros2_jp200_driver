@@ -18,8 +18,10 @@ namespace jp200_driver{
         RCLCPP_INFO(this->get_logger(), "Set Parameter");
         declare_parameter("serial_port", "/dev/ttyACM0");
         declare_parameter("baud_rate", 115200);
+        declare_parameter("enable_servo_response", true);
         get_parameter("serial_port", port_name_);
         get_parameter("baud_rate", baud_rate_);
+        get_parameter("enable_servo_response", enable_servo_response);
 
         // add subscriber
         RCLCPP_INFO(this->get_logger(), "Initialize node");
@@ -27,6 +29,7 @@ namespace jp200_driver{
         timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::read_serial, this));
 
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
+        RCLCPP_INFO()
 
         fd_ = open_port();
         if(fd_ < 0)
@@ -85,8 +88,8 @@ namespace jp200_driver{
 
         tx_packet_ = utils.createJp200Cmd(command_);
 
-        int error = write_serial();
-        if(error > 0)
+        int write = write_serial();
+        if(write > 0)
         {
             RCLCPP_INFO(this->get_logger(), "write %s to {%d}", tx_packet_.c_str(), fd_);
         }
@@ -98,10 +101,10 @@ namespace jp200_driver{
         fcntl(fd, F_SETFL,0);
         struct termios conf_tio;
         tcgetattr(fd,&conf_tio);
-        speed_t BAUDRATE = baud_rate_;
+        speed_t BAUDRATE = B1152000;
         cfsetispeed(&conf_tio, BAUDRATE);
         cfsetospeed(&conf_tio, BAUDRATE);
-        conf_tio.c_lflag &= ~ECHO;
+        conf_tio.c_lflag &= ~(ECHO | ICANON);
         conf_tio.c_cc[VMIN]=0;
         conf_tio.c_cc[VTIME]=0;
         tcsetattr(fd,TCSANOW,&conf_tio);

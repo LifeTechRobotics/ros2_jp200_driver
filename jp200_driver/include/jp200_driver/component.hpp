@@ -38,6 +38,7 @@ namespace jp200_driver {
             std::string port_name_;
             int baud_rate_;
             int fd_;
+            bool enable_servo_response;
             std::string tx_packet_;
             std::string rx_packet_;
             JP200Utils::JP200Cmd command_;

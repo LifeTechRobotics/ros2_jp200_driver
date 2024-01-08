@@ -108,7 +108,7 @@ namespace jp200_driver{
     void JP200Component::close_port()
     {
         RCLCPP_INFO(this->get_logger(), "Close port");
-        auto closer = close(fd_);
+        close(fd_);
     }
 
     void JP200Component::write_serial()

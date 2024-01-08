@@ -95,7 +95,7 @@ namespace jp200_driver{
         fcntl(fd, F_SETFL,0);
         struct termios conf_tio;
         tcgetattr(fd,&conf_tio);
-        speed_t BAUDRATE = B115200;
+        speed_t BAUDRATE = baud_rate_;
         cfsetispeed(&conf_tio, BAUDRATE);
         cfsetospeed(&conf_tio, BAUDRATE);
         conf_tio.c_lflag &= ~ECHO;
@@ -111,8 +111,12 @@ namespace jp200_driver{
         close(fd_);
     }
 
-    void JP200Component::write_serial()
+    int JP200Component::write_serial()
     {
+        if(fd_ < 0)
+        {
+            
+        }
         const char *packet = tx_packet_.c_str();
         int error = write(fd_, packet, strlen(packet));
 
@@ -121,7 +125,7 @@ namespace jp200_driver{
         }
     }
 
-    void JP200Component::read_serial()
+    int JP200Component::read_serial()
     {
         char buf[100];
         ssize_t bytes_read = read(fd_, buf, sizeof(buf) - 1);

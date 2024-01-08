@@ -31,17 +31,13 @@ namespace jp200_driver {
 
             int open_port();
             void close_port();
-            void read_serial();
-            void write_serial();
+            int read_serial();
+            int write_serial();
 
         private:
             std::string port_name_;
             int baud_rate_;
             int fd_;
-            int servo_num_;
-            double tx_time_per_bytes;
-            double packet_timeout_;
-            double packet_start_time_;
             std::string tx_packet_;
             std::string rx_packet_;
             JP200Utils::JP200Cmd command_;

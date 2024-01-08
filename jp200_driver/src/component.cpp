@@ -32,6 +32,7 @@ namespace jp200_driver{
         if(fd_ < 0)
         {
             RCLCPP_ERROR(this->get_logger() , "Failed to open port");
+            this->close_port();
         }else{
             RCLCPP_INFO(this->get_logger(), "Serial port was connected <%d>", fd_);
         }
@@ -97,7 +98,7 @@ namespace jp200_driver{
         speed_t BAUDRATE = B115200;
         cfsetispeed(&conf_tio, BAUDRATE);
         cfsetospeed(&conf_tio, BAUDRATE);
-        conf_tio.c_lflag &= ~(ECHO | ICANON);
+        conf_tio.c_lflag &= ~ECHO;
         conf_tio.c_cc[VMIN]=0;
         conf_tio.c_cc[VTIME]=0;
         tcsetattr(fd,TCSANOW,&conf_tio);

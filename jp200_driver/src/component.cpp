@@ -26,10 +26,13 @@ namespace jp200_driver{
         // add subscriber
         RCLCPP_INFO(this->get_logger(), "Initialize node");
         cmd_subscriber_ = this->create_subscription<jp200_msgs::msg::JP200>("/jp200_cmd", 0, std::bind(&JP200Component::callback, this, _1));
-        timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::read_serial, this));
-
+        if(enable_servo_response)
+        {
+            timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::read_serial, this));
+            state_publisher_ = this->create_publisher<jp200_msgs::msg::Response>("/state", 0);
+        }
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
-        RCLCPP_INFO(this->get_logger(), "port:%s, baud rate:%d, enable servo response:%s", port_name_, baud_rate_, enable_servo_response);
+        RCLCPP_INFO(this->get_logger(), "port:%s, baud rate:%d, enable servo response:%s", port_name_.c_str(), baud_rate_, std::to_string(enable_servo_response).c_str());
 
         fd_ = open_port();
         if(fd_ < 0)
@@ -86,7 +89,7 @@ namespace jp200_driver{
         command_.current_gain.d = msg.current_gain.d;
         command_.current_gain.f = msg.current_gain.f;
 
-        tx_packet_ = utils.createJp200Cmd(command_);
+        tx_packet_ = utils.createJp200Cmd(command_, enable_servo_response);
 
         int write = write_serial();
         if(write > 0)

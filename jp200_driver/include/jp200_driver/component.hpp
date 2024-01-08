@@ -6,6 +6,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float32.hpp>
 #include <jp200_msgs/msg/jp200.hpp>
+#include <jp200_msgs/msg/response.hpp>
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -45,7 +46,7 @@ namespace jp200_driver {
             JP200Utils utils;
 
             rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_;
-            rclcpp::Publisher<std_msgs::msg::Float32>::SharedPtr state_publisher_;
+            rclcpp::Publisher<jp200_msgs::msg::Response>::SharedPtr state_publisher_;
             rclcpp::TimerBase::SharedPtr timer_;
     };
 }

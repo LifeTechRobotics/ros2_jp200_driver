@@ -52,7 +52,7 @@ namespace jp200_driver
                 bool error_checker;
             };
             
-            std::string createJp200Cmd(JP200Cmd cmd);
+            std::string createJp200Cmd(JP200Cmd cmd, bool enable_response);
     };
 }
 

@@ -4,7 +4,7 @@
 
 namespace jp200_driver
 {
-    std::string JP200Utils::createJp200Cmd(JP200Cmd cmd)
+    std::string JP200Utils::createJp200Cmd(JP200Cmd cmd, bool enable_response)
     {
         std::string send = "#";
         send += std::to_string(cmd.id);
@@ -180,8 +180,16 @@ namespace jp200_driver
             }
         }
 
-        send.insert(send.begin(), '<');
-        send.push_back('>');
+        if(enable_response)
+        {
+            send.insert(send.begin(), '<');
+            send.push_back('>');
+        }
+        else
+        {
+            send.insert(send.begin(), '[');
+            send.push_back(']');
+        }
 
         return send;
     }

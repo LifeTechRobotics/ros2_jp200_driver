@@ -1,6 +1,8 @@
 #ifndef UTILS_HPP_
 #define UTILS_HPP_
 
+#define EMPTY "emp"
+
 #include <vector>
 #include <string>
 #include <fcntl.h>
@@ -64,9 +66,9 @@ namespace jp200_driver
             JP200Utils();
             
             std::string createJp200Cmd(std::vector<JP200Cmd> cmd, bool enable_response);
-            int open_port(std::string port_name);
+            int open_port(std::string port_name, int baud_rate);
             void close_port(int fd);
-            int read_serial(int fd);
+            std::string read_serial(int fd);
             int write_serial(int fd, std::string tx_packet);
             speed_t get_baud_rate(int baud_rate);
 

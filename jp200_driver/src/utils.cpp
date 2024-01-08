@@ -204,13 +204,13 @@ namespace jp200_driver
         return send;
     }
 
-    int JP200Utils::open_port(std::string port_name)
+    int JP200Utils::open_port(std::string port_name, int baud_rate)
     {
         int fd=open(port_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
         fcntl(fd, F_SETFL,0);
         struct termios conf_tio;
         tcgetattr(fd,&conf_tio);
-        speed_t BAUDRATE = get_baud_rate();
+        speed_t BAUDRATE = get_baud_rate(baud_rate);
         cfsetispeed(&conf_tio, BAUDRATE);
         cfsetospeed(&conf_tio, BAUDRATE);
         conf_tio.c_lflag &= ~(ECHO | ICANON);
@@ -235,11 +235,11 @@ namespace jp200_driver
         return write(fd, packet, strlen(packet));
     }
 
-    int JP200Utils::read_serial(int fd)
+    std::string JP200Utils::read_serial(int fd)
     {
         if(fd < 0)
         {
-            return -1;
+            return "";
         }
         char buf[100];
         ssize_t bytes_read = read(fd, buf, sizeof(buf) - 1);

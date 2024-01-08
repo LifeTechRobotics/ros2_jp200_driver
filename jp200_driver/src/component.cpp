@@ -16,20 +16,23 @@ namespace jp200_driver{
     :Node("jp200_demo", options)
     {
         RCLCPP_INFO(this->get_logger(), "Set Parameter");
+
         declare_parameter("serial_port", "/dev/ttyACM0");
         declare_parameter("baud_rate", 115200);
         declare_parameter("enable_servo_response", true);
+        declare_parameter("servo_num", 1);
         get_parameter("serial_port", port_name_);
         get_parameter("baud_rate", baud_rate_);
         get_parameter("enable_servo_response", enable_servo_response);
+        get_parameter("servo_num", servo_num);
 
         // add subscriber
         RCLCPP_INFO(this->get_logger(), "Initialize node");
-        cmd_subscriber_ = this->create_subscription<jp200_msgs::msg::JP200>("/jp200_cmd", 0, std::bind(&JP200Component::callback, this, _1));
+        // cmd_subscriber_ = this->create_subscription<jp200_msgs::msg::JP200>("/jp200_cmd", 0, std::bind(&JP200Component::callback, this, _1));
         if(enable_servo_response)
         {
-            timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::read_serial, this));
-            state_publisher_ = this->create_publisher<jp200_msgs::msg::Response>("/state", 0);
+            read_timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::read_serial, this));
+            // state_publisher_ = this->create_publisher<jp200_msgs::msg::Response>("/state", 0);
         }
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
         RCLCPP_INFO(this->get_logger(), "port:%s, baud rate:%d, enable servo response:%s", port_name_.c_str(), baud_rate_, std::to_string(enable_servo_response).c_str());
@@ -41,6 +44,65 @@ namespace jp200_driver{
             this->close_port();
         }else{
             RCLCPP_INFO(this->get_logger(), "Serial port was connected <%d>", fd_);
+        }
+    }
+
+    void JP200Component::add_subscriber()
+    {
+        for(int i = 0; i < servo_num; i++)
+        {
+            commands_.push_back(jp200_driver::JP200Utils::JP200Cmd());
+            std::string topic_name = "servo_command/" + i;
+            auto sub = this->create_subscription<jp200_msgs::msg::JP200>(topic_name, 0,
+                [this, i](const jp200_msgs::msg::JP200::SharedPtr msg)
+                {
+                    commands_[i].id = msg.id;
+                    commands_[i].control_mode = msg.control_mode;
+
+                    commands_[i].angle.enable = msg.angle_cmd.enable;
+                    commands_[i].angle.value = msg.angle_cmd.value;
+
+                    commands_[i].velocity.enable = msg.velocity_cmd.enable;
+                    command_.velocity.value = msg.velocity_cmd.value;
+
+                    command_.current.enable = msg.current_cmd.enable;
+                    command_.current.value = msg.current_cmd.value;
+
+                    command_.pwm_enable = msg.enable_pwm;
+                    command_.pwm_rate = msg.pwm_cmd;
+
+                    command_.angle.get_state = msg.state.enable_get_angle;
+                    command_.velocity.get_state = msg.state.enable_get_velocity;
+                    command_.current.get_state = msg.state.enable_get_current;
+                    command_.get_pwm = msg.state.enable_get_pwm;
+                    command_.get_mpu_temp = msg.state.enable_get_mpu_temp;
+                    command_.get_amp_temp = msg.state.enable_get_amp_temp;
+                    command_.get_motor_temp = msg.state.enable_get_motor_temp;
+                    command_.get_status = msg.state.enable_get_status;
+                    command_.get_voltage = msg.state.enable_get_voltage;
+
+                    command_.position_gain.enable = msg.position_gain.enable;
+                    command_.position_gain.p = msg.position_gain.p;
+                    command_.position_gain.i = msg.position_gain.i;
+                    command_.position_gain.d = msg.position_gain.d;
+                    command_.position_gain.f = msg.position_gain.f;
+
+                    command_.velocity_gain.enable = msg.velocity_gain.enable;
+                    command_.velocity_gain.p = msg.velocity_gain.p;
+                    command_.velocity_gain.i = msg.velocity_gain.i;
+                    command_.velocity_gain.d = msg.velocity_gain.d;
+                    command_.velocity_gain.f = msg.velocity_gain.f;
+
+                    command_.current_gain.enable = msg.current_gain.enable;
+                    command_.current_gain.p = msg.current_gain.p;
+                    command_.current_gain.i = msg.current_gain.i;
+                    command_.current_gain.d = msg.current_gain.d;
+                    command_.current_gain.f = msg.current_gain.f;
+                }
+            );
+
+            cmd_subscribers_.push_back(sub);
+            
         }
     }
 

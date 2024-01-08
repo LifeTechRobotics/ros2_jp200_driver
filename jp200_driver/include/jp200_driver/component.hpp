@@ -28,6 +28,8 @@ namespace jp200_driver {
                 const rclcpp::NodeOptions& options=rclcpp::NodeOptions()
             );
 
+            void add_subscriber();
+            void add_publisher();
             void callback(const jp200_msgs::msg::JP200 msg);
 
             int open_port();
@@ -39,16 +41,17 @@ namespace jp200_driver {
         private:
             std::string port_name_;
             int baud_rate_;
+            int servo_num;
             int fd_;
             bool enable_servo_response;
             std::string tx_packet_;
             std::string rx_packet_;
-            JP200Utils::JP200Cmd command_;
+            std::vector<JP200Utils::JP200Cmd> commands_;
             JP200Utils utils;
 
-            rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_;
-            rclcpp::Publisher<jp200_msgs::msg::Response>::SharedPtr state_publisher_;
-            rclcpp::TimerBase::SharedPtr timer_;
+            std::vector<rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr> cmd_subscribers_;
+            std::vector<rclcpp::Publisher<jp200_msgs::msg::Response>::SharedPtr> state_publishers_;
+            rclcpp::TimerBase::SharedPtr read_timer_, write_timer_;
     };
 }
 

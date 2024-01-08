@@ -29,7 +29,7 @@ namespace jp200_driver{
         timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::read_serial, this));
 
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
-        RCLCPP_INFO()
+        RCLCPP_INFO(this->get_logger(), "port:%s, baud rate:%d, enable servo response:%s", port_name_, baud_rate_, enable_servo_response);
 
         fd_ = open_port();
         if(fd_ < 0)

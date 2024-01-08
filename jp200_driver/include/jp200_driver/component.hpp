@@ -34,6 +34,7 @@ namespace jp200_driver {
             void close_port();
             int read_serial();
             int write_serial();
+            speed_t get_baud_rate();
 
         private:
             std::string port_name_;

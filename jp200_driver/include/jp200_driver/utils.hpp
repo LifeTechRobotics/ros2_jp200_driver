@@ -81,14 +81,29 @@ namespace jp200_driver
                 float voltage_feedback;
                 float status_feedback;
             };
+
+            static JP200Utils *getJP200Utils(std::string port_name, int baud_rate);
+            JP200Utils(std::string port_name, int baud_rate);
             
-            std::string createJp200Cmd(std::vector<JP200Cmd> cmd, bool enable_response);
+            void createJp200Cmd(std::vector<JP200Cmd> cmd, bool enable_response);
             Response getResponse(std::string rx_packet, int motor_id);
-            int open_port(std::string port_name, int baud_rate);
-            void close_port(int fd);
-            std::string read_serial(int fd);
-            int write_serial(int fd, std::string tx_packet);
+
+            void open_port();
+            void close_port();
+            std::string read_serial();
+            int write_serial();
             speed_t get_baud_rate(int baud_rate);
+
+            std::string get_port_name();
+            int get_fd();
+            int get_baud_rate();
+
+        private:
+            std::string port_name_;
+            int baud_rate_;
+            int fd_;
+            std::string tx_packet_;
+            std::string rx_packet_;
 
     };
 }

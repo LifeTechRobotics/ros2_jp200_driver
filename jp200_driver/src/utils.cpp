@@ -2,200 +2,208 @@
 #include <vector>
 #include <cstdint>
 
-namespace jp200_driver
-{
-    std::string JP200Utils::createJp200Cmd(std::vector<JP200Cmd> cmds, bool enable_response)
+using namespace jp200_driver;
+
+    JP200Utils *JP200Utils::getJP200Utils(std::string port_name, int baud_rate)
     {
-        std::string send = "";
+        return (JP200Utils *)(new JP200Utils(port_name, baud_rate));
+    }
+
+    JP200Utils::JP200Utils(std::string port_name, int baud_rate)
+    {
+        port_name_ = port_name;
+        baud_rate_ = baud_rate;
+    }
+
+    void JP200Utils::createJp200Cmd(std::vector<JP200Cmd> cmds, bool enable_response)
+    {
         for(auto cmd : cmds)
         {
-            send.push_back('#');
-            send += std::to_string(cmd.id);
+            tx_packet_.push_back('#');
+            tx_packet_ += std::to_string(cmd.id);
 
-            send.push_back('E');
-            send.push_back('X');
-            send.push_back('=');
-            send += std::to_string(cmd.control_mode);
+            tx_packet_.push_back('E');
+            tx_packet_.push_back('X');
+            tx_packet_.push_back('=');
+            tx_packet_ += std::to_string(cmd.control_mode);
 
             if(cmd.angle.enable)
             {
-                send.push_back('T');
-                send.push_back('A');
-                send.push_back('=');
+                tx_packet_.push_back('T');
+                tx_packet_.push_back('A');
+                tx_packet_.push_back('=');
 
                 auto target = (int)(cmd.angle.value*100);
-                send += std::to_string(target);
+                tx_packet_ += std::to_string(target);
             }
             if(cmd.velocity.enable)
             {
-                send.push_back('T');
-                send.push_back('V');
-                send.push_back('=');
+                tx_packet_.push_back('T');
+                tx_packet_.push_back('V');
+                tx_packet_.push_back('=');
 
                 auto target = (int)(cmd.velocity.value);
-                send += std::to_string(target);
+                tx_packet_ += std::to_string(target);
             }
             if(cmd.current.enable)
             {
-                send.push_back('T');
-                send.push_back('C');
-                send.push_back('=');
+                tx_packet_.push_back('T');
+                tx_packet_.push_back('C');
+                tx_packet_.push_back('=');
 
                 auto target = (int)(cmd.current.value);
-                send += std::to_string(target);
+                tx_packet_ += std::to_string(target);
             }
             if(cmd.pwm_enable)
             {
-                send.push_back('T');
-                send.push_back('P');
-                send.push_back('=');
+                tx_packet_.push_back('T');
+                tx_packet_.push_back('P');
+                tx_packet_.push_back('=');
 
                 auto target = (int)(cmd.pwm_rate*100);
-                send += std::to_string(target);
+                tx_packet_ += std::to_string(target);
             }
             if(cmd.angle.get_state)
             {
-                send.push_back('C');
-                send.push_back('A');
+                tx_packet_.push_back('C');
+                tx_packet_.push_back('A');
             }
             if(cmd.velocity.get_state)
             {
-                send.push_back('C');
-                send.push_back('V');
+                tx_packet_.push_back('C');
+                tx_packet_.push_back('V');
             }
             if(cmd.current.get_state)
             {
-                send.push_back('C');
-                send.push_back('C');
+                tx_packet_.push_back('C');
+                tx_packet_.push_back('C');
             }
             if(cmd.get_pwm)
             {
-                send.push_back('C');
-                send.push_back('P');
+                tx_packet_.push_back('C');
+                tx_packet_.push_back('P');
             }
             if(cmd.get_mpu_temp)
             {
-                send.push_back('C');
-                send.push_back('T');
-                send.push_back('0');
+                tx_packet_.push_back('C');
+                tx_packet_.push_back('T');
+                tx_packet_.push_back('0');
             }
             if(cmd.get_amp_temp)
             {
-                send.push_back('C');
-                send.push_back('T');
-                send.push_back('1');
+                tx_packet_.push_back('C');
+                tx_packet_.push_back('T');
+                tx_packet_.push_back('1');
             }
             if(cmd.get_motor_temp)
             {
-                send.push_back('C');
-                send.push_back('T');
-                send.push_back('2');
+                tx_packet_.push_back('C');
+                tx_packet_.push_back('T');
+                tx_packet_.push_back('2');
             }
             if(cmd.get_voltage)
             {
-                send.push_back('C');
-                send.push_back('B');
+                tx_packet_.push_back('C');
+                tx_packet_.push_back('B');
             }
             if(cmd.get_status)
             {
-                send.push_back('S');
-                send.push_back('T');
+                tx_packet_.push_back('S');
+                tx_packet_.push_back('T');
             }
             if(cmd.position_gain.enable)
             {
-                send.push_back('S');
-                send.push_back('G');
-                send.push_back('0');
-                send.push_back('=');
+                tx_packet_.push_back('S');
+                tx_packet_.push_back('G');
+                tx_packet_.push_back('0');
+                tx_packet_.push_back('=');
                 
                 auto target = (int)(cmd.position_gain.p);
-                send += std::to_string(target);
+                tx_packet_ += std::to_string(target);
                 if(cmd.position_gain.i != 0.0)
                 {
                     target = (int)(cmd.position_gain.i);
-                    send += std::to_string(target);
-                    send.push_back(';');
+                    tx_packet_ += std::to_string(target);
+                    tx_packet_.push_back(';');
                 }
                 if(cmd.position_gain.d != 0.0)
                 {
                     target = (int)(cmd.position_gain.d);
-                    send += std::to_string(target);
-                    send.push_back(';');
+                    tx_packet_ += std::to_string(target);
+                    tx_packet_.push_back(';');
                 }
                 if(cmd.position_gain.f != 0.0)
                 {
                     target = (int)(cmd.position_gain.f);
-                    send += std::to_string(target);
+                    tx_packet_ += std::to_string(target);
                 }
             }
             if(cmd.velocity_gain.enable)
             {
-                send.push_back('S');
-                send.push_back('G');
-                send.push_back('1');
-                send.push_back('=');
+                tx_packet_.push_back('S');
+                tx_packet_.push_back('G');
+                tx_packet_.push_back('1');
+                tx_packet_.push_back('=');
                 
                 auto target = (int)(cmd.velocity_gain.p);
-                send += std::to_string(target);
+                tx_packet_ += std::to_string(target);
                 if(cmd.velocity_gain.i != 0.0)
                 {
                     target = (int)(cmd.velocity_gain.i);
-                    send += std::to_string(target);
-                    send.push_back(';');
+                    tx_packet_ += std::to_string(target);
+                    tx_packet_.push_back(';');
                 }
                 if(cmd.velocity_gain.d != 0.0)
                 {
                     target = (int)(cmd.velocity_gain.d);
-                    send += std::to_string(target);
-                    send.push_back(';');
+                    tx_packet_ += std::to_string(target);
+                    tx_packet_.push_back(';');
                 }
                 if(cmd.velocity_gain.f != 0.0)
                 {
                     target = (int)(cmd.velocity_gain.f);
-                    send += std::to_string(target);
+                    tx_packet_ += std::to_string(target);
                 }
             }
             if(cmd.current_gain.enable)
             {
-                send.push_back('S');
-                send.push_back('G');
-                send.push_back('2');
-                send.push_back('=');
+                tx_packet_.push_back('S');
+                tx_packet_.push_back('G');
+                tx_packet_.push_back('2');
+                tx_packet_.push_back('=');
                 
                 auto target = (int)(cmd.current_gain.p);
-                send += std::to_string(target);
+                tx_packet_ += std::to_string(target);
                 if(cmd.current_gain.i != 0.0)
                 {
                     target = (int)(cmd.current_gain.i);
-                    send += std::to_string(target);
-                    send.push_back(';');
+                    tx_packet_ += std::to_string(target);
+                    tx_packet_.push_back(';');
                 }
                 if(cmd.current_gain.d != 0.0)
                 {
                     target = (int)(cmd.current_gain.d);
-                    send += std::to_string(target);
-                    send.push_back(';');
+                    tx_packet_ += std::to_string(target);
+                    tx_packet_.push_back(';');
                 }
                 if(cmd.current_gain.f != 0.0)
                 {
                     target = (int)(cmd.current_gain.f);
-                    send += std::to_string(target);
+                    tx_packet_ += std::to_string(target);
                 }
             }
         }
 
         if(enable_response)
         {
-            send.insert(send.begin(), '<');
-            send.push_back('>');
+            tx_packet_.insert(tx_packet_.begin(), '<');
+            tx_packet_.push_back('>');
         }
         else
         {
-            send.insert(send.begin(), '[');
-            send.push_back(']');
+            tx_packet_.insert(tx_packet_.begin(), '[');
+            tx_packet_.push_back(']');
         }
-
-        return send;
     }
 
     JP200Utils::Response JP200Utils::getResponse(std::string rx_packet, int motor_id)
@@ -205,43 +213,47 @@ namespace jp200_driver
         return JP200Utils::Response();
     }
 
-    int JP200Utils::open_port(std::string port_name, int baud_rate)
+    void JP200Utils::open_port()
     {
-        int fd=open(port_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
+        fd_ =open(port_name_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
         struct termios conf_tio;
-        tcgetattr(fd,&conf_tio);
-        speed_t BAUDRATE = get_baud_rate(baud_rate);
+        tcgetattr(fd_,&conf_tio);
+        speed_t BAUDRATE = get_baud_rate(baud_rate_);
         cfsetispeed(&conf_tio, BAUDRATE);
         cfsetospeed(&conf_tio, BAUDRATE);
         conf_tio.c_lflag &= ~(ECHO | ICANON);
         conf_tio.c_cc[VMIN]=0;
-        conf_tio.c_cc[VTIME]=10;
-        tcsetattr(fd,TCSANOW,&conf_tio);
-        return fd;
+        conf_tio.c_cc[VTIME]=0;
+        tcsetattr(fd_,TCSANOW,&conf_tio);
     }
 
-    void JP200Utils::close_port(int fd)
+    void JP200Utils::close_port()
     {
-        close(fd);
+        close(fd_);
     }
 
-    int JP200Utils::write_serial(int fd, std::string tx_packet)
+    int JP200Utils::get_fd()
     {
-        if(fd < 0)
+        return fd_;
+    }
+
+    int JP200Utils::write_serial()
+    {
+        if(fd_ < 0)
         {
             return -1;
         }
-        return write(fd, tx_packet.c_str(), tx_packet.length());
+        return write(fd_, tx_packet_.c_str(), tx_packet_.length());
     }
 
-    std::string JP200Utils::read_serial(int fd)
+    std::string JP200Utils::read_serial()
     {
-        if(fd < 0)
+        if(fd_ < 0)
         {
             return READ_EMPTY;
         }
         char buf[100];
-        ssize_t bytes_read = read(fd, buf, sizeof(buf) - 1);
+        ssize_t bytes_read = read(fd_, buf, sizeof(buf) - 1);
         if(bytes_read < 0)
         {
             return READ_ERROR;
@@ -298,4 +310,3 @@ namespace jp200_driver
             return -1;
         }
     }
-}

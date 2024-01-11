@@ -5,8 +5,8 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <std_msgs/msg/float32.hpp>
-#include <jp200_msgs/msg/jp200.hpp>
-#include <jp200_msgs/msg/response.hpp>
+#include <jp200_msgs/msg/multi_jp200.hpp>
+#include <jp200_msgs/msg/jp200_response.hpp>
 
 
 namespace jp200_driver {
@@ -16,27 +16,20 @@ namespace jp200_driver {
             explicit JP200Component(
                 const rclcpp::NodeOptions& options=rclcpp::NodeOptions()
             );
-
+            void topic_callback(const jp200_msgs::msg::MultiJP200 msg);
             void timer_callback();
-            void single_motor_callback(const jp200_msgs::msg::JP200 msg);
+            void msg_to_struct(jp200_msgs::msg::MultiJP200 msg, int num);
 
         private:
-            std::string port_name_;
-            int baud_rate_;
+            std::string port_name;
+            int baud_rate;
             int servo_num;
-            int fd_;
             bool enable_servo_response;
-            std::string tx_packet_;
-            std::string rx_packet_;
             std::vector<JP200Utils::JP200Cmd> commands_;
-            JP200Utils utils;
+            std::shared_ptr<jp200_driver::JP200Utils> utils;
 
-            rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_0;
-            rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_1;
-            rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_2;
-            rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_3;
-            std::vector<rclcpp::Publisher<jp200_msgs::msg::Response>::SharedPtr> state_publishers_;
-            rclcpp::TimerBase::SharedPtr timer_;
+            rclcpp::Subscription<jp200_msgs::msg::MultiJP200>::SharedPtr cmd_subscriber_;
+            rclcpp::TimerBase::SharedPtr read_timer_;
     };
 }
 

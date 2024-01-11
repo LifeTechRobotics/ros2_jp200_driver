@@ -1,3 +1,4 @@
+bool enable
 int32 id
 int32 control_mode
 Cmd angle_cmd

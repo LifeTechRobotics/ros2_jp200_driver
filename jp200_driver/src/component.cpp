@@ -44,12 +44,6 @@ namespace jp200_driver{
 
         timer_ = this->create_wall_timer(1000ms, std::bind(&JP200Component::timer_callback, this));
 
-        for(int i = 0; i < servo_num; i++)
-        {
-            std::string topic_name = "servo_state/_" + std::to_string(i);
-            state_publishers_.push_back(this->create_publisher<jp200_msgs::msg::Response>(topic_name, 0));
-            RCLCPP_INFO(this->get_logger(), "Add publisher topic name: %s", topic_name.c_str()); 
-        }
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
         int fd_ = utils.open_port(port_name_, baud_rate_);
         RCLCPP_INFO(this->get_logger(), "port:%s, baud rate:%d, enable servo response:%s", port_name_.c_str(), baud_rate_, std::to_string(enable_servo_response).c_str());
@@ -131,6 +125,12 @@ namespace jp200_driver{
         if(error > 0)
         {
             RCLCPP_INFO(this->get_logger(), "Write %s", tx_packet_.c_str());
+            rx_packet_ = utils.read_serial(fd_);
+            RCLCPP_INFO(this->get_logger(), "Read %s", rx_packet_);
+        }
+        else
+        {
+            RCLCPP_ERROR(this->get_logger(), "Failed to write");
         }
     }
 }

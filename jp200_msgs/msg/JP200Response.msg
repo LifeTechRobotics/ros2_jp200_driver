@@ -1,0 +1,21 @@
+int32 id
+bool control_mode
+
+bool target_angle
+bool target_velocity
+bool target_current
+bool target_pwm
+bool target_position_gain
+bool target_velocity_gain
+bool target_current_gain
+
+float32 angle_feedback
+float32 velocity_feedback
+float32 current_feedback
+float32 pwm_feedback
+
+float32 mpu_temp_feedback
+float32 amp_temp_feedback
+float32 motor_temp_feedback
+float32 voltage_feedback
+float32 status_feedback

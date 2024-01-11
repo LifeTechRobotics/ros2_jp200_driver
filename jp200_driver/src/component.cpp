@@ -13,7 +13,7 @@ using namespace std::chrono_literals;
 namespace jp200_driver{
 
     JP200Component::JP200Component(const rclcpp::NodeOptions& options)
-    :Node("jp200_demo", options)
+    :Node("jp200_driver_node", options)
     {
         RCLCPP_INFO(this->get_logger(), "Set Parameter");
 
@@ -30,33 +30,11 @@ namespace jp200_driver{
         utils = jp200_driver::JP200Utils();
 
         RCLCPP_INFO(this->get_logger(), "Initialize node");
-        add_subscriber();
-        write_timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::callback_write, this));
-        if(enable_servo_response)
-        {
-            read_timer_ = this->create_wall_timer(50ms, std::bind(&JP200Component::callback_read, this));
-            add_publisher();
-        }
-        RCLCPP_INFO(this->get_logger(), "Open Serial port");
-        int fd_ = utils.open_port(port_name_, baud_rate_);
-        RCLCPP_INFO(this->get_logger(), "port:%s, baud rate:%d, enable servo response:%s", port_name_.c_str(), baud_rate_, std::to_string(enable_servo_response).c_str());
-
-        if(fd_ < 0)
-        {
-            RCLCPP_ERROR(this->get_logger() , "Failed to open port");
-            utils.close_port(fd_);
-        }else{
-            RCLCPP_INFO(this->get_logger(), "Serial port was connected <%d>", fd_);
-        }
-    }
-
-    void JP200Component::add_subscriber()
-    {
         for(int i = 0; i < servo_num; i++)
         {
             commands_.push_back(jp200_driver::JP200Utils::JP200Cmd());
-            std::string topic_name = "servo_command/" + i;
-            auto sub = this->create_subscription<jp200_msgs::msg::JP200>(topic_name, 0,
+            std::string topic_name = "servo_command/_" + std::to_string(i);
+            auto subscriber = this->create_subscription<jp200_msgs::msg::JP200>(topic_name, 0,
                 [this, i](const jp200_msgs::msg::JP200 msg)
                 {
                     commands_[i].id = msg.id;
@@ -104,63 +82,82 @@ namespace jp200_driver{
                 }
             );
 
-            cmd_subscribers_.push_back(sub);
-            
+            cmd_subscribers_.push_back(subscriber);
+            RCLCPP_INFO(this->get_logger(), "Add subscriber topic name: %s", topic_name.c_str());            
         }
-    }
 
-    void JP200Component::add_publisher()
-    {
+        timer_ = this->create_wall_timer(1000ms, std::bind(&JP200Component::timer_callback, this));
+
         for(int i = 0; i < servo_num; i++)
         {
-            std::string topic_name = "servo_state/" + i;
-            auto pub = this->create_publisher<jp200_msgs::msg::Response>(topic_name, 0);
+            std::string topic_name = "servo_state/_" + std::to_string(i);
+            state_publishers_.push_back(this->create_publisher<jp200_msgs::msg::Response>(topic_name, 0));
+            RCLCPP_INFO(this->get_logger(), "Add publisher topic name: %s", topic_name.c_str()); 
         }
+        RCLCPP_INFO(this->get_logger(), "Open Serial port");
+        int fd_ = utils.open_port(port_name_, baud_rate_);
+        RCLCPP_INFO(this->get_logger(), "port:%s, baud rate:%d, enable servo response:%s", port_name_.c_str(), baud_rate_, std::to_string(enable_servo_response).c_str());
+
+        if(fd_ < 0)
+        {
+            RCLCPP_ERROR(this->get_logger() , "Failed to open port");
+            utils.close_port(fd_);
+        }else{
+            RCLCPP_INFO(this->get_logger(), "Serial port was connected <%d>", fd_);
+        }
+
     }
 
-    void JP200Component::callback_write()
+
+    void JP200Component::timer_callback()
     {
         tx_packet_ = utils.createJp200Cmd(commands_, enable_servo_response);
-
         int write = utils.write_serial(fd_, tx_packet_);
-        if(write > 0)
+        if(write >= 0)
         {
             RCLCPP_INFO(this->get_logger(), "Write %s to %d", tx_packet_.c_str(), fd_);
         }
-    }
-
-    void JP200Component::callback_read()
-    {
-        rx_packet_ = utils.read_serial(fd_);
-
-        for(int i = 0; i < servo_num; i++)
+        else
         {
-            auto response = utils.getResponse(rx_packet_, commands_[i].id);
-            auto msg = jp200_msgs::msg::Response();
-
-            msg.id = response.id;
-            msg.control_mode = response.control_mode;
-
-            msg.target_angle = response.target_angle;
-            msg.target_current = response.target_current;
-            msg.target_velocity = response.target_velocity;
-            msg.target_pwm = response.target_pwm;
-
-            msg.target_position_gain = response.target_position_gain;
-            msg.target_current_gain = response.target_current_gain;
-            msg.target_velocity_gain = response.target_velocity_gain;
-
-            msg.angle_feedback = response.angle_feedback;
-            msg.current_feedback = response.current_feedback;
-            msg.velocity_feedback = response.velocity_feedback;
-            msg.pwm_feedback = response.pwm_feedback;
-
-            msg.mpu_temp_feedback = response.mpu_temp_feedback;
-            msg.amp_temp_feedback = response.amp_temp_feedback;
-            msg.voltage_feedback = response.voltage_feedback;
-            msg.motor_temp_feedback = response.motor_temp_feedback;
-            msg.status_feedback = response.status_feedback;
-            state_publishers_[i]->publish(msg);
+            RCLCPP_INFO(this->get_logger(), "Failed to write : %s size: %ld", tx_packet_.c_str(), strlen(tx_packet_.c_str()));
         }
+
+        // rx_packet_ = utils.read_serial(fd_);
+        // RCLCPP_INFO(this->get_logger(), "Read packet : %s", rx_packet_.c_str());
     }
+
+    // void JP200Component::callback_read()
+    // {
+    //     rx_packet_ = utils.read_serial(fd_);
+
+    //     for(int i = 0; i < servo_num; i++)
+    //     {
+    //         auto response = utils.getResponse(rx_packet_, commands_[i].id);
+    //         auto msg = jp200_msgs::msg::Response();
+
+    //         msg.id = response.id;
+    //         msg.control_mode = response.control_mode;
+
+    //         msg.target_angle = response.target_angle;
+    //         msg.target_current = response.target_current;
+    //         msg.target_velocity = response.target_velocity;
+    //         msg.target_pwm = response.target_pwm;
+
+    //         msg.target_position_gain = response.target_position_gain;
+    //         msg.target_current_gain = response.target_current_gain;
+    //         msg.target_velocity_gain = response.target_velocity_gain;
+
+    //         msg.angle_feedback = response.angle_feedback;
+    //         msg.current_feedback = response.current_feedback;
+    //         msg.velocity_feedback = response.velocity_feedback;
+    //         msg.pwm_feedback = response.pwm_feedback;
+
+    //         msg.mpu_temp_feedback = response.mpu_temp_feedback;
+    //         msg.amp_temp_feedback = response.amp_temp_feedback;
+    //         msg.voltage_feedback = response.voltage_feedback;
+    //         msg.motor_temp_feedback = response.motor_temp_feedback;
+    //         msg.status_feedback = response.status_feedback;
+    //         state_publishers_[i]->publish(msg);
+    //     }
+    // }
 }

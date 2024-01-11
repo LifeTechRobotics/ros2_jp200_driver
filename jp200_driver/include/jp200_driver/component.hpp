@@ -13,14 +13,12 @@ namespace jp200_driver {
 
     class JP200Component : public rclcpp::Node{
         public:
-            JP200Component(
+            explicit JP200Component(
                 const rclcpp::NodeOptions& options=rclcpp::NodeOptions()
             );
 
-            void add_subscriber();
-            void add_publisher();
-            void callback_write();
-            void callback_read();
+            void timer_callback();
+            void single_motor_callback();
 
         private:
             std::string port_name_;
@@ -33,9 +31,12 @@ namespace jp200_driver {
             std::vector<JP200Utils::JP200Cmd> commands_;
             JP200Utils utils;
 
-            std::vector<rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr> cmd_subscribers_;
+            rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_0;
+            rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_1;
+            rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_2;
+            rclcpp::Subscription<jp200_msgs::msg::JP200>::SharedPtr cmd_subscriber_3;
             std::vector<rclcpp::Publisher<jp200_msgs::msg::Response>::SharedPtr> state_publishers_;
-            rclcpp::TimerBase::SharedPtr read_timer_, write_timer_;
+            rclcpp::TimerBase::SharedPtr timer_;
     };
 }
 

@@ -14,9 +14,6 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/ioctl.h>
-#include <linux/serial.h>
-#include <string>
-#include <vector>
 
 namespace jp200_driver
 {

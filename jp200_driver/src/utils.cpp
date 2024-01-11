@@ -6,7 +6,7 @@ namespace jp200_driver
 {
     std::string JP200Utils::createJp200Cmd(std::vector<JP200Cmd> cmds, bool enable_response)
     {
-        std::string send;
+        std::string send = "";
         for(auto cmd : cmds)
         {
             send.push_back('#');
@@ -183,7 +183,6 @@ namespace jp200_driver
                 }
             }
         }
-        
 
         if(enable_response)
         {
@@ -199,10 +198,16 @@ namespace jp200_driver
         return send;
     }
 
+    JP200Utils::Response JP200Utils::getResponse(std::string rx_packet, int motor_id)
+    {
+        std::string str_motor_id = "#" + std::to_string(motor_id);
+        
+        return JP200Utils::Response();
+    }
+
     int JP200Utils::open_port(std::string port_name, int baud_rate)
     {
         int fd=open(port_name.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
-        fcntl(fd, F_SETFL,0);
         struct termios conf_tio;
         tcgetattr(fd,&conf_tio);
         speed_t BAUDRATE = get_baud_rate(baud_rate);
@@ -210,7 +215,7 @@ namespace jp200_driver
         cfsetospeed(&conf_tio, BAUDRATE);
         conf_tio.c_lflag &= ~(ECHO | ICANON);
         conf_tio.c_cc[VMIN]=0;
-        conf_tio.c_cc[VTIME]=0;
+        conf_tio.c_cc[VTIME]=10;
         tcsetattr(fd,TCSANOW,&conf_tio);
         return fd;
     }
@@ -226,8 +231,7 @@ namespace jp200_driver
         {
             return -1;
         }
-        const char *packet = tx_packet.c_str();
-        return write(fd, packet, strlen(packet));
+        return write(fd, tx_packet.c_str(), tx_packet.length());
     }
 
     std::string JP200Utils::read_serial(int fd)

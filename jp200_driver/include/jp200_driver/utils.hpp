@@ -92,17 +92,19 @@ namespace jp200_driver
             void close_port();
             std::string read_serial();
             int write_serial();
-            speed_t get_baud_rate(int baud_rate);
+            speed_t set_baud_rate(int baud_rate);
 
             std::string get_port_name();
             int get_fd();
             int get_baud_rate();
+            std::string get_tx_packet();
+            std::string get_rx_packet();
 
         private:
             std::string port_name_;
             int baud_rate_;
             int fd_;
-            std::string tx_packet_;
+            std::string _tx_packet_;
             std::string rx_packet_;
 
     };

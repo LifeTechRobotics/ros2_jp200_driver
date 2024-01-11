@@ -39,12 +39,12 @@ using namespace jp200_driver;
         cmd_subscriber_ = this->create_subscription<jp200_msgs::msg::MultiJP200>(
         "/jp200_servo", 10, std::bind(&JP200Component::topic_callback, this, _1));
         read_timer_ = this->create_wall_timer(
-            50ms, std::bind(&JP200Component::timer_callback, this));
+            1000ms, std::bind(&JP200Component::timer_callback, this));
         
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
         utils->open_port();
 
-        RCLCPP_INFO(this->get_logger(), "port:%s, baud rate:%d, enable servo response:%s", port_name.c_str(), baud_rate, std::to_string(enable_servo_response).c_str());
+        RCLCPP_INFO(this->get_logger(), "port:%s, baud rate:%d, enable servo response:%s", utils->get_port_name().c_str(), utils->get_baud_rate(), std::to_string(enable_servo_response).c_str());
 
         if(utils->get_fd() < 0)
         {
@@ -111,7 +111,7 @@ using namespace jp200_driver;
         int error = utils->write_serial();
         if(error > 0)
         {
-            RCLCPP_INFO(this->get_logger(), "Write");
+            RCLCPP_INFO(this->get_logger(), "Write %s", utils->get_tx_packet().c_str());
         }
         else
         {

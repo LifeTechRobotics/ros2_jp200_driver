@@ -17,6 +17,7 @@ using namespace jp200_driver;
 
     void JP200Utils::createJp200Cmd(std::vector<JP200Cmd> cmds, bool enable_response)
     {
+        std::string tx_packet_ = "";
         for(auto cmd : cmds)
         {
             tx_packet_.push_back('#');
@@ -204,6 +205,8 @@ using namespace jp200_driver;
             tx_packet_.insert(tx_packet_.begin(), '[');
             tx_packet_.push_back(']');
         }
+
+        _tx_packet_ = tx_packet_;
     }
 
     JP200Utils::Response JP200Utils::getResponse(std::string rx_packet, int motor_id)
@@ -218,7 +221,7 @@ using namespace jp200_driver;
         fd_ =open(port_name_.c_str(), O_RDWR | O_NOCTTY | O_NONBLOCK);
         struct termios conf_tio;
         tcgetattr(fd_,&conf_tio);
-        speed_t BAUDRATE = get_baud_rate(baud_rate_);
+        speed_t BAUDRATE = set_baud_rate(baud_rate_);
         cfsetispeed(&conf_tio, BAUDRATE);
         cfsetospeed(&conf_tio, BAUDRATE);
         conf_tio.c_lflag &= ~(ECHO | ICANON);
@@ -232,18 +235,13 @@ using namespace jp200_driver;
         close(fd_);
     }
 
-    int JP200Utils::get_fd()
-    {
-        return fd_;
-    }
-
     int JP200Utils::write_serial()
     {
         if(fd_ < 0)
         {
             return -1;
         }
-        return write(fd_, tx_packet_.c_str(), tx_packet_.length());
+        return write(fd_, _tx_packet_.c_str(), _tx_packet_.length());
     }
 
     std::string JP200Utils::read_serial()
@@ -266,7 +264,7 @@ using namespace jp200_driver;
         }
     }
 
-    speed_t JP200Utils::get_baud_rate(int baud_rate)
+    speed_t JP200Utils::set_baud_rate(int baud_rate)
     {
         switch(baud_rate)
         {
@@ -309,4 +307,29 @@ using namespace jp200_driver;
             default:
             return -1;
         }
+    }
+
+    int JP200Utils::get_fd()
+    {
+        return fd_;
+    }
+
+    int JP200Utils::get_baud_rate()
+    {
+        return baud_rate_;
+    }
+
+    std::string JP200Utils::get_port_name()
+    {
+        return port_name_;
+    }
+
+    std::string JP200Utils::get_tx_packet()
+    {
+        return _tx_packet_;
+    }
+
+    std::string JP200Utils::get_rx_packet()
+    {
+        return rx_packet_;
     }

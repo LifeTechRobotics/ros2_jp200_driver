@@ -18,7 +18,7 @@ namespace jp200_driver {
             );
 
             void timer_callback();
-            void single_motor_callback();
+            void single_motor_callback(const jp200_msgs::msg::JP200 msg);
 
         private:
             std::string port_name_;

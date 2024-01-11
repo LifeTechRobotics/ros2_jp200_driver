@@ -30,61 +30,17 @@ namespace jp200_driver{
         utils = jp200_driver::JP200Utils();
 
         RCLCPP_INFO(this->get_logger(), "Initialize node");
-        for(int i = 0; i < servo_num; i++)
+        if(servo_num == 1)
         {
-            commands_.push_back(jp200_driver::JP200Utils::JP200Cmd());
-            std::string topic_name = "servo_command/_" + std::to_string(i);
-            auto subscriber = this->create_subscription<jp200_msgs::msg::JP200>(topic_name, 0,
-                [this, i](const jp200_msgs::msg::JP200 msg)
-                {
-                    commands_[i].id = msg.id;
-                    commands_[i].control_mode = msg.control_mode;
-
-                    commands_[i].angle.enable = msg.angle_cmd.enable;
-                    commands_[i].angle.value = msg.angle_cmd.value;
-
-                    commands_[i].velocity.enable = msg.velocity_cmd.enable;
-                    commands_[i].velocity.value = msg.velocity_cmd.value;
-
-                    commands_[i].current.enable = msg.current_cmd.enable;
-                    commands_[i].current.value = msg.current_cmd.value;
-
-                    commands_[i].pwm_enable = msg.enable_pwm;
-                    commands_[i].pwm_rate = msg.pwm_cmd;
-
-                    commands_[i].angle.get_state = msg.state.enable_get_angle;
-                    commands_[i].velocity.get_state = msg.state.enable_get_velocity;
-                    commands_[i].current.get_state = msg.state.enable_get_current;
-                    commands_[i].get_pwm = msg.state.enable_get_pwm;
-                    commands_[i].get_mpu_temp = msg.state.enable_get_mpu_temp;
-                    commands_[i].get_amp_temp = msg.state.enable_get_amp_temp;
-                    commands_[i].get_motor_temp = msg.state.enable_get_motor_temp;
-                    commands_[i].get_status = msg.state.enable_get_status;
-                    commands_[i].get_voltage = msg.state.enable_get_voltage;
-
-                    commands_[i].position_gain.enable = msg.position_gain.enable;
-                    commands_[i].position_gain.p = msg.position_gain.p;
-                    commands_[i].position_gain.i = msg.position_gain.i;
-                    commands_[i].position_gain.d = msg.position_gain.d;
-                    commands_[i].position_gain.f = msg.position_gain.f;
-
-                    commands_[i].velocity_gain.enable = msg.velocity_gain.enable;
-                    commands_[i].velocity_gain.p = msg.velocity_gain.p;
-                    commands_[i].velocity_gain.i = msg.velocity_gain.i;
-                    commands_[i].velocity_gain.d = msg.velocity_gain.d;
-                    commands_[i].velocity_gain.f = msg.velocity_gain.f;
-
-                    commands_[i].current_gain.enable = msg.current_gain.enable;
-                    commands_[i].current_gain.p = msg.current_gain.p;
-                    commands_[i].current_gain.i = msg.current_gain.i;
-                    commands_[i].current_gain.d = msg.current_gain.d;
-                    commands_[i].current_gain.f = msg.current_gain.f;
-                }
+            auto cmd = JP200Utils::JP200Cmd();
+            commands_.push_back(cmd);
+            cmd_subscriber_0 = this->create_subscription<jp200_msgs::msg::JP200>(
+                "servo/_0", 
+                0, 
+                std::bind(&JP200Component::single_motor_callback, this, _1)
             );
-
-            cmd_subscribers_.push_back(subscriber);
-            RCLCPP_INFO(this->get_logger(), "Add subscriber topic name: %s", topic_name.c_str());            
         }
+        
 
         timer_ = this->create_wall_timer(1000ms, std::bind(&JP200Component::timer_callback, this));
 
@@ -108,7 +64,6 @@ namespace jp200_driver{
 
     }
 
-
     void JP200Component::timer_callback()
     {
         tx_packet_ = utils.createJp200Cmd(commands_, enable_servo_response);
@@ -126,38 +81,56 @@ namespace jp200_driver{
         // RCLCPP_INFO(this->get_logger(), "Read packet : %s", rx_packet_.c_str());
     }
 
-    // void JP200Component::callback_read()
-    // {
-    //     rx_packet_ = utils.read_serial(fd_);
+    void JP200Component::single_motor_callback(const jp200_msgs::msg::JP200 msg)
+    {
+        commands_[0].id = msg.id;
+        commands_[0].control_mode = msg.control_mode;
 
-    //     for(int i = 0; i < servo_num; i++)
-    //     {
-    //         auto response = utils.getResponse(rx_packet_, commands_[i].id);
-    //         auto msg = jp200_msgs::msg::Response();
+        commands_[0].angle.enable = msg.angle_cmd.enable;
+        commands_[0].angle.value = msg.angle_cmd.value;
 
-    //         msg.id = response.id;
-    //         msg.control_mode = response.control_mode;
+        commands_[0].velocity.enable = msg.velocity_cmd.enable;
+        commands_[0].velocity.value = msg.velocity_cmd.value;
 
-    //         msg.target_angle = response.target_angle;
-    //         msg.target_current = response.target_current;
-    //         msg.target_velocity = response.target_velocity;
-    //         msg.target_pwm = response.target_pwm;
+        commands_[0].current.enable = msg.current_cmd.enable;
+        commands_[0].current.value = msg.current_cmd.value;
 
-    //         msg.target_position_gain = response.target_position_gain;
-    //         msg.target_current_gain = response.target_current_gain;
-    //         msg.target_velocity_gain = response.target_velocity_gain;
+        commands_[0].pwm_enable = msg.enable_pwm;
+        commands_[0].pwm_rate = msg.pwm_cmd;
 
-    //         msg.angle_feedback = response.angle_feedback;
-    //         msg.current_feedback = response.current_feedback;
-    //         msg.velocity_feedback = response.velocity_feedback;
-    //         msg.pwm_feedback = response.pwm_feedback;
+        commands_[0].angle.get_state = msg.state.enable_get_angle;
+        commands_[0].velocity.get_state = msg.state.enable_get_velocity;
+        commands_[0].current.get_state = msg.state.enable_get_current;
+        commands_[0].get_pwm = msg.state.enable_get_pwm;
+        commands_[0].get_mpu_temp = msg.state.enable_get_mpu_temp;
+        commands_[0].get_amp_temp = msg.state.enable_get_amp_temp;
+        commands_[0].get_motor_temp = msg.state.enable_get_motor_temp;
+        commands_[0].get_status = msg.state.enable_get_status;
+        commands_[0].get_voltage = msg.state.enable_get_voltage;
 
-    //         msg.mpu_temp_feedback = response.mpu_temp_feedback;
-    //         msg.amp_temp_feedback = response.amp_temp_feedback;
-    //         msg.voltage_feedback = response.voltage_feedback;
-    //         msg.motor_temp_feedback = response.motor_temp_feedback;
-    //         msg.status_feedback = response.status_feedback;
-    //         state_publishers_[i]->publish(msg);
-    //     }
-    // }
+        commands_[0].position_gain.enable = msg.position_gain.enable;
+        commands_[0].position_gain.p = msg.position_gain.p;
+        commands_[0].position_gain.i = msg.position_gain.i;
+        commands_[0].position_gain.d = msg.position_gain.d;
+        commands_[0].position_gain.f = msg.position_gain.f;
+
+        commands_[0].velocity_gain.enable = msg.velocity_gain.enable;
+        commands_[0].velocity_gain.p = msg.velocity_gain.p;
+        commands_[0].velocity_gain.i = msg.velocity_gain.i;
+        commands_[0].velocity_gain.d = msg.velocity_gain.d;
+        commands_[0].velocity_gain.f = msg.velocity_gain.f;
+
+        commands_[0].current_gain.enable = msg.current_gain.enable;
+        commands_[0].current_gain.p = msg.current_gain.p;
+        commands_[0].current_gain.i = msg.current_gain.i;
+        commands_[0].current_gain.d = msg.current_gain.d;
+        commands_[0].current_gain.f = msg.current_gain.f;
+
+        tx_packet_ = utils.createJp200Cmd(commands_, enable_servo_response);
+        int error = utils.write_serial(fd_, tx_packet_);
+        if(error > 0)
+        {
+            RCLCPP_INFO(this->get_logger(), "Write %s", tx_packet_.c_str());
+        }
+    }
 }

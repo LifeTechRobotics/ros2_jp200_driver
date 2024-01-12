@@ -4,9 +4,10 @@
     </node>
 
     <node pkg="jp200_driver" exec="jp200_driver_node" name="jp200_driver_node" output="screen">
-        <remap from="/jp200_cmd" to="/cmd"/>
+        <remap from="/jp200_servo" to="/cmd"/>
         <param name="serial_port" value="/dev/ttyUSB0"/>
         <param name="baud_rate" value="1000000"/>
         <param name="enable_servo_response" value="true"/>
+        <param name="servo_num" value="1"/>
     </node>
 </launch>

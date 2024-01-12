@@ -226,7 +226,10 @@ using namespace jp200_driver;
         cfsetospeed(&conf_tio, BAUDRATE);
         conf_tio.c_lflag &= ~(ECHO | ICANON);
         conf_tio.c_cc[VMIN]=0;
-        conf_tio.c_cc[VTIME]=0;
+        conf_tio.c_cc[VTIME]=10;
+        conf_tio.c_cflag &= ~PARENB;
+        conf_tio.c_cflag &= ~CSTOPB;
+        conf_tio.c_cflag |= CS8;
         tcsetattr(fd_,TCSANOW,&conf_tio);
     }
 
@@ -241,7 +244,7 @@ using namespace jp200_driver;
         {
             return -1;
         }
-        return write(fd_, _tx_packet_.c_str(), _tx_packet_.length());
+        return write(fd_, _tx_packet_.c_str(), _tx_packet_.size());
     }
 
     std::string JP200Utils::read_serial()
@@ -251,7 +254,7 @@ using namespace jp200_driver;
             return READ_EMPTY;
         }
         char buf[100];
-        ssize_t bytes_read = read(fd_, buf, sizeof(buf) - 1);
+        ssize_t bytes_read = read(fd_, buf, sizeof(buf));
         if(bytes_read < 0)
         {
             return READ_ERROR;

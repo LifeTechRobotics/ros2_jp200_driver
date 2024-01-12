@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <string>
+#include <unistd.h>
 
 #include "jp200_driver/component.hpp"
 
@@ -13,7 +14,7 @@ using namespace jp200_driver;
 
     JP200Component::JP200Component(const rclcpp::NodeOptions& options)
     :Node("jp200_driver_node", options)
-    {
+    {   
         RCLCPP_INFO(this->get_logger(), "Set Parameter");
 
         declare_parameter("serial_port", "/dev/ttyACM0");
@@ -39,7 +40,7 @@ using namespace jp200_driver;
         cmd_subscriber_ = this->create_subscription<jp200_msgs::msg::MultiJP200>(
         "/jp200_servo", 10, std::bind(&JP200Component::topic_callback, this, _1));
         read_timer_ = this->create_wall_timer(
-            1000ms, std::bind(&JP200Component::timer_callback, this));
+            50ms, std::bind(&JP200Component::timer_callback, this));
         
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
         utils->open_port();
@@ -54,6 +55,7 @@ using namespace jp200_driver;
             RCLCPP_INFO(this->get_logger(), "Serial port was connected <%d>", utils->get_fd());
         }
 
+        sleep(1);
     }
 
     void JP200Component::topic_callback(const jp200_msgs::msg::MultiJP200 msg)
@@ -103,10 +105,6 @@ using namespace jp200_driver;
             commands_[i].current_gain.f = msg.servos[i].current_gain.f;
         }
 
-    }
-
-    void JP200Component::timer_callback()
-    {
         utils->createJp200Cmd(commands_, enable_servo_response);
         int error = utils->write_serial();
         if(error > 0)
@@ -116,6 +114,15 @@ using namespace jp200_driver;
         else
         {
             RCLCPP_ERROR(this->get_logger(), "Failed to write");
+        }
+    }
+
+    void JP200Component::timer_callback()
+    {
+        if(enable_servo_response)
+        {
+            utils->read_serial();
+            RCLCPP_INFO(this->get_logger(), "Read %s", utils->get_rx_packet().c_str());
         }
     }
 

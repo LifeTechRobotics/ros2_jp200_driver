@@ -28,13 +28,11 @@ class DemoCommandPublisher : public rclcpp::Node
 
       // set pwm(%)
       message.servos[0].enable_pwm = true;
-      message.servos[0].pwm_cmd = 20;
+      message.servos[0].pwm_cmd = 10;
       
       // set angle command
       message.servos[0].angle_cmd.enable = true;
       message.servos[0].angle_cmd.value = count;
-
-      message.servos[0].state.enable_get_angle = true;
 
       publisher_->publish(message);
       count += 10;

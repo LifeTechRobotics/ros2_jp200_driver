@@ -6,7 +6,6 @@ Cmd velocity_cmd
 Cmd current_cmd
 bool enable_pwm
 float32 pwm_cmd
-State state
 Gain position_gain
 Gain velocity_gain
 Gain current_gain

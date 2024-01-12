@@ -16,7 +16,6 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Cmd.msg"
   "msg/Gain.msg"
   "msg/JP200.msg"
-  "msg/State.msg"
   "msg/JP200Response.msg"
   "msg/MultiJP200.msg"
 )

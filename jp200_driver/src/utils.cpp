@@ -64,54 +64,41 @@ using namespace jp200_driver;
                 auto target = (int)(cmd.pwm_rate*100);
                 tx_packet_ += std::to_string(target);
             }
-            if(cmd.angle.get_state)
-            {
-                tx_packet_.push_back('C');
-                tx_packet_.push_back('A');
-            }
-            if(cmd.velocity.get_state)
-            {
-                tx_packet_.push_back('C');
-                tx_packet_.push_back('V');
-            }
-            if(cmd.current.get_state)
-            {
-                tx_packet_.push_back('C');
-                tx_packet_.push_back('C');
-            }
-            if(cmd.get_pwm)
-            {
-                tx_packet_.push_back('C');
-                tx_packet_.push_back('P');
-            }
-            if(cmd.get_mpu_temp)
-            {
-                tx_packet_.push_back('C');
-                tx_packet_.push_back('T');
-                tx_packet_.push_back('0');
-            }
-            if(cmd.get_amp_temp)
-            {
-                tx_packet_.push_back('C');
-                tx_packet_.push_back('T');
-                tx_packet_.push_back('1');
-            }
-            if(cmd.get_motor_temp)
-            {
-                tx_packet_.push_back('C');
-                tx_packet_.push_back('T');
-                tx_packet_.push_back('2');
-            }
-            if(cmd.get_voltage)
-            {
-                tx_packet_.push_back('C');
-                tx_packet_.push_back('B');
-            }
-            if(cmd.get_status)
-            {
-                tx_packet_.push_back('S');
-                tx_packet_.push_back('T');
-            }
+                
+            tx_packet_.push_back('C');
+            tx_packet_.push_back('A');
+            
+            tx_packet_.push_back('C');
+            tx_packet_.push_back('V');
+            
+            tx_packet_.push_back('C');
+            tx_packet_.push_back('C');
+
+            tx_packet_.push_back('C');
+            tx_packet_.push_back('P');
+            
+            tx_packet_.push_back('C');
+            tx_packet_.push_back('T');
+            tx_packet_.push_back('0');
+
+            tx_packet_.push_back('C');
+            tx_packet_.push_back('T');
+            tx_packet_.push_back('1');
+            
+            tx_packet_.push_back('C');
+            tx_packet_.push_back('T');
+            tx_packet_.push_back('2');
+            
+            
+            
+            tx_packet_.push_back('C');
+            tx_packet_.push_back('B');
+            
+            
+            
+            tx_packet_.push_back('S');
+            tx_packet_.push_back('T');
+            
             if(cmd.position_gain.enable)
             {
                 tx_packet_.push_back('S');
@@ -209,11 +196,12 @@ using namespace jp200_driver;
         _tx_packet_ = tx_packet_;
     }
 
-    JP200Utils::Response JP200Utils::getResponse(std::string rx_packet, int motor_id)
+    JP200Utils::Response JP200Utils::getResponse(std::string rx_packet, int servo_num)
     {
-        std::string str_motor_id = "#" + std::to_string(motor_id);
-        
-        return JP200Utils::Response();
+        for(int i = 0; i < servo_num; i++)
+        {
+            
+        }
     }
 
     void JP200Utils::open_port()
@@ -247,23 +235,23 @@ using namespace jp200_driver;
         return write(fd_, _tx_packet_.c_str(), _tx_packet_.size());
     }
 
-    std::string JP200Utils::read_serial()
+    int JP200Utils::read_serial()
     {
         if(fd_ < 0)
         {
-            return READ_EMPTY;
+            return -1;
         }
         char buf[100];
         ssize_t bytes_read = read(fd_, buf, sizeof(buf));
         if(bytes_read < 0)
         {
-            return READ_ERROR;
+            return -1;
         }
         else
         {
             buf[bytes_read] = '\0';
-            std::string rx_packet_ = buf;
-            return rx_packet_;
+            _rx_packet_ = buf;
+            return 1;
         }
     }
 
@@ -334,5 +322,5 @@ using namespace jp200_driver;
 
     std::string JP200Utils::get_rx_packet()
     {
-        return rx_packet_;
+        return _rx_packet_;
     }

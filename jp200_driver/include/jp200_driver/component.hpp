@@ -18,7 +18,6 @@ namespace jp200_driver {
             );
             void topic_callback(const jp200_msgs::msg::MultiJP200 msg);
             void timer_callback();
-            void msg_to_struct(jp200_msgs::msg::MultiJP200 msg, int num);
 
         private:
             std::string port_name;

@@ -36,11 +36,15 @@ using namespace jp200_driver;
             commands_.push_back(cmd);
         }
 
-        RCLCPP_INFO(this->get_logger(), "Initialize node");
+        RCLCPP_INFO(this->get_logger(), "Initialize subscriber");
         cmd_subscriber_ = this->create_subscription<jp200_msgs::msg::JP200MultiArray>(
         "/jp200_servo", 10, std::bind(&JP200Component::topic_callback, this, _1));
-        read_timer_ = this->create_wall_timer(
-            100ms, std::bind(&JP200Component::timer_callback, this));
+        if(enable_servo_response)
+        {
+            RCLCPP_INFO(this->get_logger(), "Initialize timer and response publisher");
+            read_timer_ = this->create_wall_timer(100ms, std::bind(&JP200Component::timer_callback, this));
+            resp_publisher_ = this->create_publisher<jp200_msgs::msg::JP200Responses>("/jp200_response", 0);
+        }
         
         RCLCPP_INFO(this->get_logger(), "Open Serial port");
         utils->open_port();
@@ -141,7 +145,14 @@ using namespace jp200_driver;
                 msg.voltage_feedback = resps_[i].voltage_feedback;
                 msg.status_feedback = resps_[i].status_feedback;
 
-                
+                msg.target_position_gain = resps_[i].target_position_gain;
+                msg.target_velocity_gain = resps_[i].target_velocity_gain;
+                msg.target_current_gain = resps_[i].target_current_gain;
+
+                pub_msg.responses.push_back(msg);
+                pub_msg.servo_num++;
             }
+
+            resp_publisher_->publish(pub_msg);
         }
     }

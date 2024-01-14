@@ -16,8 +16,9 @@ rosidl_generate_interfaces(${PROJECT_NAME}
   "msg/Cmd.msg"
   "msg/Gain.msg"
   "msg/JP200.msg"
-  "msg/JP200Response.msg"
-  "msg/MultiJP200.msg"
+  "msg/Response.msg"
+  "msg/JP200Responses.msg"
+  "msg/JP200MultiArray.msg"
 )
 
 if(BUILD_TESTING)

@@ -6,6 +6,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <jp200_msgs/msg/jp200_multi_array.hpp>
 #include <jp200_msgs/msg/jp200_responses.hpp>
+#include <jp200_msgs/msg/response.hpp>
 
 
 namespace jp200_driver {

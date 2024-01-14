@@ -238,31 +238,67 @@ using namespace jp200_driver;
             int _index = one_motor_packet.find("TA=");
             if(_index != std::string::npos)
             {
-                std::string ta_str = one_motor_packet.substr(_index + 2, 2);
-                if(ta_str == "OK")
+                std::string _str = one_motor_packet.substr(_index + 2, 2);
+                if(_str == "OK")
                 {
                     resp.target_angle = true;
                 }
-                else if(ta_str == "NG")
+                else if(_str == "NG")
                 {
                     resp.target_angle = false;
                 }
             }
 
-            // TA
-            int _index = one_motor_packet.find("TA=");
+            // TV
+            _index = one_motor_packet.find("TV=");
             if(_index != std::string::npos)
             {
-                std::string ta_str = one_motor_packet.substr(_index + 2, 2);
-                if(ta_str == "OK")
+                std::string _str = one_motor_packet.substr(_index + 2, 2);
+                if(_str == "OK")
                 {
-                    resp.target_angle = true;
+                    resp.target_velocity = true;
                 }
-                else if(ta_str == "NG")
+                else if(_str == "NG")
                 {
-                    resp.target_angle = false;
+                    resp.target_velocity = false;
                 }
             }
+
+            // TC
+            _index = one_motor_packet.find("TC=");
+            if(_index != std::string::npos)
+            {
+                std::string _str = one_motor_packet.substr(_index + 2, 2);
+                if(_str == "OK")
+                {
+                    resp.target_current = true;
+                }
+                else if(_str == "NG")
+                {
+                    resp.target_current = false;
+                }
+            }
+
+            // TP
+            _index = one_motor_packet.find("TP=");
+            if(_index != std::string::npos)
+            {
+                std::string _str = one_motor_packet.substr(_index + 2, 2);
+                if(_str == "OK")
+                {
+                    resp.target_pwm = true;
+                }
+                else if(_str == "NG")
+                {
+                    resp.target_pwm = false;
+                }
+            }
+
+            // CA
+            int ca_i = one_motor_packet.find("CA=");
+            int cv_i = one_motor_packet.find("CV=");
+            int range = cv_i - ca_i;
+            std::string ca_str = one_motor_packet.substr(ca_i+2, range);
 
 
             resps.push_back(resp);

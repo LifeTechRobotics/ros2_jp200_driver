@@ -313,6 +313,34 @@ using namespace jp200_driver;
                 }
             }
 
+            // velocity gain
+            if(sg1_i != std::string::npos)
+            {
+                std::string _str = one_motor_packet.substr(sg1_i + 2, 2);
+                if(_str == "OK")
+                {
+                    resp.target_velocity_gain = true;
+                }
+                else if(_str == "NG")
+                {
+                    resp.target_velocity_gain = false;
+                }
+            }
+
+            // current gain
+            if(sg2_i != std::string::npos)
+            {
+                std::string _str = one_motor_packet.substr(sg2_i + 2, 2);
+                if(_str == "OK")
+                {
+                    resp.target_current_gain = true;
+                }
+                else if(_str == "NG")
+                {
+                    resp.target_current_gain = false;
+                }
+            }
+
             // get values position
             int ca_i = one_motor_packet.find("CA=");
             int cv_i = one_motor_packet.find("CV=");
@@ -373,10 +401,10 @@ using namespace jp200_driver;
             resp.voltage_feedback = value;
 
             // ST[status]
-            range = st_i - cb_i;
-            _str = one_motor_packet.substr(cb_i + 2, range);
+            range = sg0_i - st_i;
+            _str = one_motor_packet.substr(st_i + 2, range);
             value = atof(_str.c_str());
-            resp.voltage_feedback = value;
+            resp.status_feedback = value;
 
 
             resps.push_back(resp);

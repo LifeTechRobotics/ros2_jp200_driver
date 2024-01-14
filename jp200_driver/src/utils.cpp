@@ -294,11 +294,89 @@ using namespace jp200_driver;
                 }
             }
 
-            // CA
+            // result of setting gain
+            int sg0_i = one_motor_packet.find("SG0=");
+            int sg1_i = one_motor_packet.find("SG1=");
+            int sg2_i = one_motor_packet.find("SG2=");
+
+            // position gain
+            if(sg0_i != std::string::npos)
+            {
+                std::string _str = one_motor_packet.substr(sg0_i + 2, 2);
+                if(_str == "OK")
+                {
+                    resp.target_position_gain = true;
+                }
+                else if(_str == "NG")
+                {
+                    resp.target_position_gain = false;
+                }
+            }
+
+            // get values position
             int ca_i = one_motor_packet.find("CA=");
             int cv_i = one_motor_packet.find("CV=");
+            int cc_i = one_motor_packet.find("CC=");
+            int cp_i = one_motor_packet.find("CP=");
+            int ct0_i = one_motor_packet.find("CT0=");
+            int ct1_i = one_motor_packet.find("CT1=");
+            int ct2_i = one_motor_packet.find("CT2=");
+            int cb_i = one_motor_packet.find("CB=");
+            int st_i = one_motor_packet.find("ST=");
+
+            // CA[x100 deg]
             int range = cv_i - ca_i;
-            std::string ca_str = one_motor_packet.substr(ca_i+2, range);
+            std::string _str = one_motor_packet.substr(ca_i+2, range);
+            float value = atof(_str.c_str()) / 100;
+            resp.angle_feedback = value;
+
+            // CV[x1000 rot/sec]
+            range = cc_i - cv_i;
+            _str = one_motor_packet.substr(cv_i + 2, range);
+            value = atof(_str.c_str()) / 1000;
+            resp.velocity_feedback = value;
+
+            // CC[mA]
+            range = cp_i - cc_i;
+            _str = one_motor_packet.substr(cc_i + 2, range);
+            value = atof(_str.c_str());
+            resp.current_feedback = value;
+
+            // CP[%]
+            range = ct0_i - cp_i;
+            _str = one_motor_packet.substr(cp_i + 2, range);
+            value = atof(_str.c_str());
+            resp.pwm_feedback = value;
+
+            // CT0[x10 degC]
+            range = ct1_i - ct0_i;
+            _str = one_motor_packet.substr(ct0_i + 2, range);
+            value = atof(_str.c_str()) / 10;
+            resp.mpu_temp_feedback = value;
+
+            // CT1[x10 degC]
+            range = ct2_i - ct1_i;
+            _str = one_motor_packet.substr(ct1_i + 2, range);
+            value = atof(_str.c_str()) / 10;
+            resp.amp_temp_feedback = value;
+
+            // CT2[x10 degC]
+            range = cb_i - ct2_i;
+            _str = one_motor_packet.substr(ct2_i + 2, range);
+            value = atof(_str.c_str()) / 10;
+            resp.motor_temp_feedback = value;
+
+            // CB[mV]
+            range = st_i - cb_i;
+            _str = one_motor_packet.substr(cb_i + 2, range);
+            value = atof(_str.c_str());
+            resp.voltage_feedback = value;
+
+            // ST[status]
+            range = st_i - cb_i;
+            _str = one_motor_packet.substr(cb_i + 2, range);
+            value = atof(_str.c_str());
+            resp.voltage_feedback = value;
 
 
             resps.push_back(resp);

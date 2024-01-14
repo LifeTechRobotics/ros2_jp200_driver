@@ -235,7 +235,7 @@ using namespace jp200_driver;
             }
 
             // TA
-            int _index = one_motor_packet.find("TA=");
+            long unsigned int _index = one_motor_packet.find("TA=");
             if(_index != std::string::npos)
             {
                 std::string _str = one_motor_packet.substr(_index + 2, 2);
@@ -295,9 +295,9 @@ using namespace jp200_driver;
             }
 
             // result of setting gain
-            int sg0_i = one_motor_packet.find("SG0=");
-            int sg1_i = one_motor_packet.find("SG1=");
-            int sg2_i = one_motor_packet.find("SG2=");
+            long unsigned int sg0_i = one_motor_packet.find("SG0=");
+            long unsigned int sg1_i = one_motor_packet.find("SG1=");
+            long unsigned int sg2_i = one_motor_packet.find("SG2=");
 
             // position gain
             if(sg0_i != std::string::npos)

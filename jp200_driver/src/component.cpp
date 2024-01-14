@@ -118,41 +118,43 @@ using namespace jp200_driver;
             if(error > 0)
             {
                 RCLCPP_INFO(this->get_logger(), "Read %s", utils->get_rx_packet().c_str());
+                
+                resps_ = utils->getResponse(servo_num);
+                auto pub_msg = jp200_msgs::msg::JP200Responses();
+                for(int i = 0; i < servo_num; i++)
+                {
+                    auto msg = jp200_msgs::msg::Response();
+                    msg.id = resps_[i].id;
+                    msg.control_mode = resps_[i].control_mode;
+
+                    msg.target_angle = resps_[i].target_angle;
+                    msg.target_velocity = resps_[i].target_velocity;
+                    msg.target_current = resps_[i].target_current;
+                    msg.target_pwm = resps_[i].target_pwm;
+
+                    msg.angle_feedback = resps_[i].angle_feedback;
+                    msg.velocity_feedback = resps_[i].velocity_feedback;
+                    msg.current_feedback = resps_[i].current_feedback;
+                    msg.pwm_feedback = resps_[i].pwm_feedback;
+
+                    msg.mpu_temp_feedback =resps_[i].mpu_temp_feedback;
+                    msg.amp_temp_feedback =resps_[i].amp_temp_feedback;
+                    msg.motor_temp_feedback =resps_[i].motor_temp_feedback;
+
+                    msg.voltage_feedback = resps_[i].voltage_feedback;
+                    msg.status_feedback = resps_[i].status_feedback;
+
+                    msg.target_position_gain = resps_[i].target_position_gain;
+                    msg.target_velocity_gain = resps_[i].target_velocity_gain;
+                    msg.target_current_gain = resps_[i].target_current_gain;
+
+                    pub_msg.responses.push_back(msg);
+                    pub_msg.servo_num++;
+                }
+
+                resp_publisher_->publish(pub_msg);
             }
 
-            resps_ = utils->getResponse(servo_num);
-            auto pub_msg = jp200_msgs::msg::JP200Responses();
-            for(int i = 0; i < servo_num; i++)
-            {
-                auto msg = jp200_msgs::msg::Response();
-                msg.id = resps_[i].id;
-                msg.control_mode = resps_[i].control_mode;
-
-                msg.target_angle = resps_[i].target_angle;
-                msg.target_velocity = resps_[i].target_velocity;
-                msg.target_current = resps_[i].target_current;
-                msg.target_pwm = resps_[i].target_pwm;
-
-                msg.angle_feedback = resps_[i].angle_feedback;
-                msg.velocity_feedback = resps_[i].velocity_feedback;
-                msg.current_feedback = resps_[i].current_feedback;
-                msg.pwm_feedback = resps_[i].pwm_feedback;
-
-                msg.mpu_temp_feedback =resps_[i].mpu_temp_feedback;
-                msg.amp_temp_feedback =resps_[i].amp_temp_feedback;
-                msg.motor_temp_feedback =resps_[i].motor_temp_feedback;
-
-                msg.voltage_feedback = resps_[i].voltage_feedback;
-                msg.status_feedback = resps_[i].status_feedback;
-
-                msg.target_position_gain = resps_[i].target_position_gain;
-                msg.target_velocity_gain = resps_[i].target_velocity_gain;
-                msg.target_current_gain = resps_[i].target_current_gain;
-
-                pub_msg.responses.push_back(msg);
-                pub_msg.servo_num++;
-            }
-
-            resp_publisher_->publish(pub_msg);
+            
         }
     }

@@ -5,7 +5,7 @@
 
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joy.hpp"
-#include "jp200_msgs/msg/multi_jp200.hpp"
+#include "jp200_msgs/msg/jp200_multi_array.hpp"
 
 using namespace std::chrono_literals;
 
@@ -15,14 +15,15 @@ class DemoCommandPublisher : public rclcpp::Node
     DemoCommandPublisher()
     : Node("demo_command_publisher")
     {
-      publisher_ = this->create_publisher<jp200_msgs::msg::MultiJP200>("/cmd", 10);
+      publisher_ = this->create_publisher<jp200_msgs::msg::JP200MultiArray>("/cmd", 10);
       timer_ = this->create_wall_timer(1000ms, std::bind(&DemoCommandPublisher::callback, this));
     }
 
   private:
     void callback()
     {
-      auto message = jp200_msgs::msg::MultiJP200();
+      auto message = jp200_msgs::msg::JP200MultiArray();
+      message.servo_num = 1;
       message.servos[0].id = 1;
       message.servos[0].control_mode = 1;
 
@@ -38,7 +39,7 @@ class DemoCommandPublisher : public rclcpp::Node
       count += 10;
     }
 
-    rclcpp::Publisher<jp200_msgs::msg::MultiJP200>::SharedPtr publisher_;
+    rclcpp::Publisher<jp200_msgs::msg::JP200MultiArray>::SharedPtr publisher_;
     rclcpp::TimerBase::SharedPtr timer_;
     size_t count;
 };

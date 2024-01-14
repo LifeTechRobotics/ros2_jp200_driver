@@ -6,6 +6,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/msg/joy.hpp"
 #include "jp200_msgs/msg/jp200_multi_array.hpp"
+#include "jp200_msgs/msg/jp200.hpp"
 
 using namespace std::chrono_literals;
 
@@ -22,20 +23,23 @@ class DemoCommandPublisher : public rclcpp::Node
   private:
     void callback()
     {
-      auto message = jp200_msgs::msg::JP200MultiArray();
-      message.servo_num = 1;
-      message.servos[0].id = 1;
-      message.servos[0].control_mode = 1;
+      auto send_message = jp200_msgs::msg::JP200MultiArray();
+      auto msg = jp200_msgs::msg::JP200();
+      send_message.servo_num = 1;
+      msg.id = 1;
+      msg.control_mode = 1;
 
       // set pwm(%)
-      message.servos[0].enable_pwm = true;
-      message.servos[0].pwm_cmd = 10;
+      msg.enable_pwm = true;
+      msg.pwm_cmd = 10;
       
       // set angle command
-      message.servos[0].angle_cmd.enable = true;
-      message.servos[0].angle_cmd.value = count;
+      msg.angle_cmd.enable = true;
+      msg.angle_cmd.value = count;
 
-      publisher_->publish(message);
+      send_message.servos.push_back(msg);
+
+      publisher_->publish(send_message);
       count += 10;
     }
 

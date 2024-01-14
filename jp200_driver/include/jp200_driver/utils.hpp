@@ -83,7 +83,7 @@ namespace jp200_driver
             JP200Utils(std::string port_name, int baud_rate);
             
             void createJp200Cmd(std::vector<JP200Cmd> cmd, bool enable_response);
-            Response getResponse(std::string rx_packet, int servo_num);
+            std::vector<Response> getResponse(int servo_num);
 
             void open_port();
             void close_port();

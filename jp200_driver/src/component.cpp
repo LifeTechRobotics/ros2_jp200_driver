@@ -37,7 +37,7 @@ using namespace jp200_driver;
         }
 
         RCLCPP_INFO(this->get_logger(), "Initialize node");
-        cmd_subscriber_ = this->create_subscription<jp200_msgs::msg::MultiJP200>(
+        cmd_subscriber_ = this->create_subscription<jp200_msgs::msg::JP200MultiArray>(
         "/jp200_servo", 10, std::bind(&JP200Component::topic_callback, this, _1));
         read_timer_ = this->create_wall_timer(
             100ms, std::bind(&JP200Component::timer_callback, this));
@@ -57,7 +57,7 @@ using namespace jp200_driver;
         sleep(1);
     }
 
-    void JP200Component::topic_callback(const jp200_msgs::msg::MultiJP200 msg)
+    void JP200Component::topic_callback(const jp200_msgs::msg::JP200MultiArray msg)
     {
         for(int i = 0; i < servo_num; i++)
         {

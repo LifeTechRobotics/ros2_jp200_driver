@@ -196,12 +196,79 @@ using namespace jp200_driver;
         _tx_packet_ = tx_packet_;
     }
 
-    JP200Utils::Response JP200Utils::getResponse(std::string rx_packet, int servo_num)
+    std::vector<JP200Utils::Response> JP200Utils::getResponse(int servo_num)
     {
+        std::vector<JP200Utils::Response> resps;
+        std::string left_over_packet = "";
+        std::string one_motor_packet = "";
+        int start_index = 0;
+        int end_index = 0;
+
+        left_over_packet = _rx_packet_;
+
         for(int i = 0; i < servo_num; i++)
         {
-            
+            auto resp = JP200Utils::Response();
+            start_index = left_over_packet.find_first_of('(');
+            end_index = left_over_packet.find_first_of(')');
+
+            one_motor_packet = left_over_packet.substr(start_index, end_index);
+            left_over_packet = left_over_packet.substr(end_index);
+
+            // id
+            int id_index = one_motor_packet.find("#");
+            int id_end_index = one_motor_packet.find("EX");
+            int id_range = id_index - id_end_index;
+            std::string id_str = one_motor_packet.substr(id_index, id_range);
+            resp.id = atoi(id_str.c_str());
+
+            // EX(control mode)
+            int ex_index = one_motor_packet.find("EX=");
+            std::string ex_str = one_motor_packet.substr(ex_index + 2, 2);
+            if(ex_str == "OK")
+            {
+                resp.control_mode = true;
+            }
+            else if(ex_str == "NG")
+            {
+                resp.control_mode = false;
+            }
+
+            // TA
+            int _index = one_motor_packet.find("TA=");
+            if(_index != std::string::npos)
+            {
+                std::string ta_str = one_motor_packet.substr(_index + 2, 2);
+                if(ta_str == "OK")
+                {
+                    resp.target_angle = true;
+                }
+                else if(ta_str == "NG")
+                {
+                    resp.target_angle = false;
+                }
+            }
+
+            // TA
+            int _index = one_motor_packet.find("TA=");
+            if(_index != std::string::npos)
+            {
+                std::string ta_str = one_motor_packet.substr(_index + 2, 2);
+                if(ta_str == "OK")
+                {
+                    resp.target_angle = true;
+                }
+                else if(ta_str == "NG")
+                {
+                    resp.target_angle = false;
+                }
+            }
+
+
+            resps.push_back(resp);
         }
+
+        return resps;
     }
 
     void JP200Utils::open_port()

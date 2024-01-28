@@ -1,2 +1,2 @@
 int32 servo_num
-Response[] responses
+JP200Response[] responses
